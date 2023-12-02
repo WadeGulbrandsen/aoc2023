@@ -4,10 +4,13 @@ import (
 	"fmt"
 
 	"github.com/WadeGulbrandsen/aoc2023/day01"
+	"github.com/WadeGulbrandsen/aoc2023/day02"
 )
 
 func main() {
 	fmt.Println("Advent of Code 2023")
-	fmt.Printf("The answer for Day 01, Problem 1 is: %v", day01.Problem1("day01/input.txt"))
-	fmt.Printf("The answer for Day 01, Problem 2 is: %v", day01.Problem2("day01/input.txt"))
+	fmt.Printf("\nThe answer for Day 01, Problem 1 is: %v\n\n", day01.Problem1("day01/input.txt"))
+	fmt.Printf("\nThe answer for Day 01, Problem 2 is: %v\n\n", day01.Problem2("day01/input.txt"))
+	fmt.Printf("\nThe answer for Day 02, Problem 1 is: %v\n\n", day02.Problem1("day02/input.txt"))
+	fmt.Printf("\nThe answer for Day 02, Problem 2 is: %v\n\n", day02.Problem2("day02/input.txt"))
 }
