@@ -4,7 +4,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/WadeGulbrandsen/aoc2023?logo=github)
 ![GitHub repo size](https://img.shields.io/github/repo-size/WadeGulbrandsen/aoc2023?logo=github)
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/WadeGulbrandsen/aoc2023/go.yml?logo=github&label=tests)
-[![Go Coverage](https://github.com/WadeGulbrandsen/aoc2023/wiki/coverage.svg)](https://raw.githack.com/wiki/WadeGulbrandsen/aoc2023/coverage.html)
+[![Go Coverage](https://github.com/WadeGulbrandsen/aoc2023/wiki/coverage.svg)](https://github.com/WadeGulbrandsen/aoc2023/wiki/Test-coverage-report)
 
 # Advent of Code 2023
 
