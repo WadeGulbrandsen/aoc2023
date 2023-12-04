@@ -33,6 +33,6 @@ jobs:
         report: true
         chart: true
         amend: true
-        reuese-go: true
+        reuse-go: true
       if: github.event_name == 'push'
       continue-on-error: true
