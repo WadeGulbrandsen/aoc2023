@@ -1,4 +1,4 @@
-package day02
+package main
 
 import (
 	"bufio"
@@ -150,4 +150,10 @@ func Problem1(filename string) int {
 
 func Problem2(filename string) int {
 	return problemSolver(filename, minDiceNeededForGame)
+}
+
+func main() {
+	fmt.Println("Advent of Code 2023")
+	fmt.Printf("\nThe answer for Day 02, Problem 1 is: %v\n\n", Problem1("input.txt"))
+	fmt.Printf("\nThe answer for Day 02, Problem 2 is: %v\n\n", Problem2("input.txt"))
 }

@@ -1,4 +1,4 @@
-package day04
+package main
 
 import (
 	"bufio"
@@ -136,4 +136,10 @@ func Problem2(filename string) int {
 		sum += v
 	}
 	return sum
+}
+
+func main() {
+	fmt.Println("Advent of Code 2023")
+	fmt.Printf("\nThe answer for Day 04, Problem 1 is: %v\n\n", Problem1("input.txt"))
+	fmt.Printf("\nThe answer for Day 04, Problem 2 is: %v\n\n", Problem2("input.txt"))
 }
