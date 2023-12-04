@@ -1,10 +1,10 @@
-![GitHub License](https://img.shields.io/github/license/WadeGulbrandsen/aoc2023)
-![GitHub top language](https://img.shields.io/github/languages/top/WadeGulbrandsen/aoc2023)
-![GitHub repo size](https://img.shields.io/github/repo-size/WadeGulbrandsen/aoc2023)
-![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/WadeGulbrandsen/aoc2023)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/WadeGulbrandsen/aoc2023/go.yml)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/WadeGulbrandsen/aoc2023/go_tests.yml?label=testing)
+![GitHub License](https://img.shields.io/github/license/WadeGulbrandsen/aoc2023?logo=github)
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/WadeGulbrandsen/aoc2023?logo=go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/WadeGulbrandsen/aoc2023)](https://goreportcard.com/report/github.com/WadeGulbrandsen/aoc2023)
+![GitHub top language](https://img.shields.io/github/languages/top/WadeGulbrandsen/aoc2023?logo=github)
+![GitHub repo size](https://img.shields.io/github/repo-size/WadeGulbrandsen/aoc2023?logo=github)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/WadeGulbrandsen/aoc2023/go.yml?logo=github&label=tests)
+[![Go Coverage](https://github.com/WadeGulbrandsen/aoc2023/wiki/coverage.svg)](https://raw.githack.com/wiki/WadeGulbrandsen/aoc2023/coverage.html)
 
 # Advent of Code 2023
 
