@@ -6,6 +6,7 @@ import (
 	"github.com/WadeGulbrandsen/aoc2023/day01"
 	"github.com/WadeGulbrandsen/aoc2023/day02"
 	"github.com/WadeGulbrandsen/aoc2023/day03"
+	"github.com/WadeGulbrandsen/aoc2023/day04"
 )
 
 func main() {
@@ -16,4 +17,6 @@ func main() {
 	fmt.Printf("\nThe answer for Day 02, Problem 2 is: %v\n\n", day02.Problem2("day02/input.txt"))
 	fmt.Printf("\nThe answer for Day 03, Problem 1 is: %v\n\n", day03.Problem1("day03/input.txt"))
 	fmt.Printf("\nThe answer for Day 03, Problem 2 is: %v\n\n", day03.Problem2("day03/input.txt"))
+	fmt.Printf("\nThe answer for Day 04, Problem 1 is: %v\n\n", day04.Problem1("day04/input.txt"))
+	fmt.Printf("\nThe answer for Day 04, Problem 2 is: %v\n\n", day04.Problem2("day04/input.txt"))
 }
