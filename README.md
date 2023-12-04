@@ -2,6 +2,9 @@
 ![GitHub License](https://img.shields.io/github/license/WadeGulbrandsen/aoc2023)
 ![GitHub top language](https://img.shields.io/github/languages/top/WadeGulbrandsen/aoc2023)
 ![GitHub repo size](https://img.shields.io/github/repo-size/WadeGulbrandsen/aoc2023)
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/WadeGulbrandsen/aoc2023)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/WadeGulbrandsen/aoc2023/go.yml)
+
 
 
 
