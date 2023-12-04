@@ -1,5 +1,11 @@
-# Advent of Code 2023
 [![Go Report Card](https://goreportcard.com/badge/github.com/WadeGulbrandsen/aoc2023)](https://goreportcard.com/report/github.com/WadeGulbrandsen/aoc2023)
+![GitHub License](https://img.shields.io/github/license/WadeGulbrandsen/aoc2023)
+![GitHub top language](https://img.shields.io/github/languages/top/WadeGulbrandsen/aoc2023)
+![GitHub repo size](https://img.shields.io/github/repo-size/WadeGulbrandsen/aoc2023)
+
+
+
+# Advent of Code 2023
 
 I'm trying to do the [Advent of Code](https://adventofcode.com/) in [Go](https://go.dev/) this year.
 
