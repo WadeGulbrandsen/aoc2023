@@ -1,4 +1,5 @@
 # Advent of Code 2023
+[![Go Report Card](https://goreportcard.com/badge/github.com/WadeGulbrandsen/aoc2023)](https://goreportcard.com/report/github.com/WadeGulbrandsen/aoc2023)
 
 I'm trying to do the [Advent of Code](https://adventofcode.com/) in [Go](https://go.dev/) this year.
 
