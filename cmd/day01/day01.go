@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
 
 var number_names = map[string]int{
@@ -76,40 +76,12 @@ func getNumberWithWords(s string, ch chan int) {
 	ch <- value
 }
 
-func problemSolver(filename string, fn func(string, chan int)) int {
-	fmt.Printf("Opening %v\n", filename)
-	readFile, err := os.Open(filename)
-
-	if err != nil {
-		fmt.Println(err)
-		return 0
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	ch := make(chan int)
-
-	l := 0
-	for fileScanner.Scan() {
-		go fn(fileScanner.Text(), ch)
-		l++
-	}
-	readFile.Close()
-
-	sum := 0
-	for i := 0; i < l; i++ {
-		sum += <-ch
-	}
-
-	return sum
-}
-
 func Problem1(filename string) int {
-	return problemSolver(filename, getNumber)
+	return internal.SumSolver(filename, getNumber)
 }
 
 func Problem2(filename string) int {
-	return problemSolver(filename, getNumberWithWords)
+	return internal.SumSolver(filename, getNumberWithWords)
 }
 
 func main() {
