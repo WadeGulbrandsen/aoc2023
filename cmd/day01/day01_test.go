@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestDay01(t *testing.T) {
 	t.Run("Problem1 with sample.txt", func(t *testing.T) {
@@ -39,4 +42,8 @@ func TestGetNumber(t *testing.T) {
 			t.Fatalf("Expected %v got %v", a, r)
 		}
 	})
+}
+
+func TestMain(m *testing.M) {
+	os.Exit(m.Run())
 }
