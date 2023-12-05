@@ -57,8 +57,6 @@ type Almanac struct {
 }
 
 func (a *Almanac) Step(v int, step string) int {
-	// a.lock.RLock()
-	// defer a.lock.RUnlock()
 	for _, r := range a.maps[step] {
 		if next, found := r.Lookup(v); found {
 			return next
@@ -68,8 +66,6 @@ func (a *Almanac) Step(v int, step string) int {
 }
 
 func (a *Almanac) Backstep(v int, step string) int {
-	// a.lock.RLock()
-	// defer a.lock.RUnlock()
 	for _, r := range a.maps[step] {
 		if prev, found := r.RLookup(v); found {
 			return prev
@@ -155,9 +151,7 @@ func Problem1(filename string) int {
 	defer internal.Un(internal.Trace("Problem1"))
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
 	fileToAlmanac(filename, &almanac)
-	// almanac.lock.RLock()
 	seeds := almanac.seeds
-	// almanac.lock.RUnlock()
 	location := math.MaxInt
 	ch := make(chan int)
 	for _, seed := range seeds {
@@ -175,17 +169,12 @@ func Problem2(filename string) int {
 	defer internal.Un(internal.Trace("Problem2"))
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
 	fileToAlmanac(filename, &almanac)
-	// almanac.lock.RLock()
 	seeds := almanac.seeds
-	// almanac.lock.RUnlock()
 	ranges := make(map[int]int)
 	for i := 0; i < len(seeds); i += 2 {
 		ranges[seeds[i]] = seeds[i] + seeds[i+1] - 1
 	}
 	for i := 0; true; i++ {
-		// if i%1000000 == 0 {
-		// 	fmt.Printf("Location %v\n", i)
-		// }
 		seed := almanac.LocationToSeed(i)
 		for low, high := range ranges {
 			if seed >= low && seed <= high {
@@ -198,7 +187,7 @@ func Problem2(filename string) int {
 }
 
 func main() {
-	filename := "sample.txt"
+	filename := "input.txt"
 	fmt.Println("Advent of Code 2023")
 	fmt.Printf("\nThe answer for Day 05, Problem 1 is: %v\n\n", Problem1(filename))
 	fmt.Printf("\nThe answer for Day 05, Problem 2 is: %v\n\n", Problem2(filename))
