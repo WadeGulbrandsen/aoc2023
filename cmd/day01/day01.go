@@ -27,12 +27,14 @@ func getNumber(s string, ch chan int) {
 	last := strings.LastIndexFunc(s, unicode.IsDigit)
 	if first < 0 || last < 0 {
 		fmt.Printf("No digits in %v", s)
+		ch <- 0
 		return
 	}
 	sn := fmt.Sprintf("%s%s", string(s[first]), string(s[last]))
 	v, err := strconv.Atoi(sn)
 	if err != nil {
 		fmt.Println(err)
+		ch <- 0
 		return
 	}
 	fmt.Printf(" %v found in %v\n", v, s)
