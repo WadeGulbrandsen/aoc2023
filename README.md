@@ -17,10 +17,14 @@ Had some performance issues with my solution for the second problem.
 
 First I added a global `backSteps` variable to be used by the `LocationToSeed` method. Which didn't make any noticable difference. I also removed some of the print statements which also made no effect on the speed. Replacing `for i := 0; i <= 157211394; i++` with `for i := 0; true; i++` for the condition in the loop that does most of the work did nothing either.
 
-Instead of going backwards through the steps going through forwards but using ranges of numbers made this super fast.
-
 ### No read locks
 Since after creation there are no writes to the almanac struct it's safe not to use locks. This shaved 35 seconds from the time.
+
+### Ranges
+
+Total rewrite of the second problem to use ranges of numbers instead of indivual numbers made this super fast.
+
+Added an interal library for ranges since they might be useful for future problems.
 
 | Version | Sample 1 | Sample 2 | Input 1 | Input 2 |
 | ------- | -------- | -------- | ------- | ------- |
