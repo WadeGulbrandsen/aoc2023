@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"math"
 	"os"
@@ -32,8 +33,21 @@ var backSteps = []string{
 	"seed-to-soil",
 }
 
+type Range = internal.Range
+type RangeList = internal.RangeList
+
 type RangeMap struct {
 	dest, source, length int
+}
+
+func (r *RangeMap) GetRanges() (Range, Range) {
+	return Range{Start: r.source, End: r.source + r.length - 1},
+		Range{Start: r.dest, End: r.dest + r.length - 1}
+}
+
+func (r *RangeMap) SourceRangeMapper() ProcessingMap {
+	s, _ := r.GetRanges()
+	return ProcessingMap{input: s, offset: r.dest - r.source}
 }
 
 func (r *RangeMap) Lookup(v int) (int, bool) {
@@ -54,6 +68,15 @@ type Almanac struct {
 	lock  sync.RWMutex
 	seeds []int
 	maps  map[string][]RangeMap
+}
+
+func (a *Almanac) GetMapperForStep(step string) ProcessingMapList {
+	var p ProcessingMapList
+	for _, m := range a.maps[step] {
+		p = append(p, m.SourceRangeMapper())
+	}
+	p.Sort()
+	return p
 }
 
 func (a *Almanac) Step(v int, step string) int {
@@ -165,23 +188,78 @@ func Problem1(filename string) int {
 	return location
 }
 
+type ProcessingMap struct {
+	input  Range
+	offset int
+}
+
+func (p ProcessingMap) Process(r Range) (Range, Range, Range) {
+	before, contained, after := p.input.SplitOtherRange(r)
+	output := Range{}
+	if !contained.IsEmpty() {
+		output.Start = contained.Start + p.offset
+		output.End = contained.End + p.offset
+	}
+	return before, output, after
+}
+
+func cmpPM(a, b ProcessingMap) int {
+	if n := internal.CompareRanges(a.input, b.input); n != 0 {
+		return n
+	}
+	return cmp.Compare(a.offset, b.offset)
+}
+
+type ProcessingMapList []ProcessingMap
+
+func (p ProcessingMapList) Sort() {
+	slices.SortFunc(p, cmpPM)
+}
+
+func (p ProcessingMapList) Process(r RangeList) RangeList {
+	var next RangeList
+	for _, rl := range r {
+		remaining := rl
+		for _, pm := range p {
+			before, processed, after := pm.Process(remaining)
+			remaining = after
+			next = append(next, before, processed)
+			if remaining.IsEmpty() {
+				break
+			}
+		}
+		if !remaining.IsEmpty() {
+			next = append(next, remaining)
+		}
+	}
+	next = next.FilterEmpty()
+	next = slices.Compact(next)
+	return next
+}
+
+func getLocationRangesFromSeedRanges(a *Almanac, r RangeList, step int) RangeList {
+	r.Sort()
+	if step < 0 || step >= len(steps) {
+		return r
+	}
+	m := a.GetMapperForStep(steps[step])
+	next := m.Process(r)
+	return getLocationRangesFromSeedRanges(a, next, step+1)
+}
+
 func Problem2(filename string) int {
-	defer internal.Un(internal.Trace("Problem2"))
+	defer internal.Un(internal.Trace("Problem2 (Now with ranges!)"))
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
 	fileToAlmanac(filename, &almanac)
 	seeds := almanac.seeds
-	ranges := make(map[int]int)
+	var ranges RangeList
 	for i := 0; i < len(seeds); i += 2 {
-		ranges[seeds[i]] = seeds[i] + seeds[i+1] - 1
+		ranges = append(ranges, Range{Start: seeds[i], End: seeds[i] + seeds[i+1] - 1})
 	}
-	for i := 0; true; i++ {
-		seed := almanac.LocationToSeed(i)
-		for low, high := range ranges {
-			if seed >= low && seed <= high {
-				fmt.Printf("Seed %v to location %v\n", seed, i)
-				return i
-			}
-		}
+	fmt.Println(ranges)
+	locations := getLocationRangesFromSeedRanges(&almanac, ranges, 0)
+	if len(locations) > 0 {
+		return locations[0].Start
 	}
 	return 0
 }
