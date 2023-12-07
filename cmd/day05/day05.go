@@ -171,7 +171,7 @@ func fileToAlmanac(filename string, a *Almanac) {
 }
 
 func Problem1(filename string) int {
-	defer internal.Un(internal.Trace("Problem1"))
+	defer internal.EndTimer(internal.StartTimer("Problem1"))
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
 	fileToAlmanac(filename, &almanac)
 	seeds := almanac.seeds
@@ -248,7 +248,7 @@ func getLocationRangesFromSeedRanges(a *Almanac, r RangeList, step int) RangeLis
 }
 
 func Problem2(filename string) int {
-	defer internal.Un(internal.Trace("Problem2 (Now with ranges!)"))
+	defer internal.EndTimer(internal.StartTimer("Problem2 (Now with ranges!)"))
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
 	fileToAlmanac(filename, &almanac)
 	seeds := almanac.seeds

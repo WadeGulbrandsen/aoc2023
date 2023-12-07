@@ -29,16 +29,13 @@ func TestDay01(t *testing.T) {
 }
 
 func TestGetNumber(t *testing.T) {
-	ch := make(chan int)
 	t.Run("Good input", func(t *testing.T) {
-		go getNumber("fdasf2lkjkljklj5ooonaa", ch)
-		if a, r := 25, <-ch; a != r {
+		if a, r := 25, getNumber("fdasf2lkjkljklj5ooonaa"); a != r {
 			t.Fatalf("Expected %v got %v", a, r)
 		}
 	})
 	t.Run("Bad input", func(t *testing.T) {
-		go getNumber("vjheib", ch)
-		if a, r := 0, <-ch; a != r {
+		if a, r := 0, getNumber("vjheib"); a != r {
 			t.Fatalf("Expected %v got %v", a, r)
 		}
 	})

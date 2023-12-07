@@ -70,40 +70,35 @@ func validateHand(h Hand) bool {
 	return true
 }
 
-func validateGame(s string, ch chan int) {
+func validateGame(s string) int {
 	g, err := stringToGame(s)
 	if err != nil {
 		fmt.Println(err)
-		ch <- 0
-		return
+		return 0
 	}
 	if len(g.hands) == 0 {
 		fmt.Printf("Game %+v has no hands\n", g)
-		ch <- 0
-		return
+		return 0
 	}
 	for i, hand := range g.hands {
 		if !validateHand(hand) {
 			fmt.Printf("Game %+v is invalid because hand %v is not valid\n", g, i)
-			ch <- 0
-			return
+			return 0
 		}
 	}
 	fmt.Printf("Game %+v is valid\n", g)
-	ch <- g.id
+	return g.id
 }
 
-func minDiceNeededForGame(s string, ch chan int) {
+func minDiceNeededForGame(s string) int {
 	game, err := stringToGame(s)
 	if err != nil {
 		fmt.Println(err)
-		ch <- 0
-		return
+		return 0
 	}
 	if len(game.hands) == 0 {
 		fmt.Printf("Game %+v has no hands\n", game)
-		ch <- 0
-		return
+		return 0
 	}
 	r, g, b := 0, 0, 0
 	for _, hand := range game.hands {
@@ -113,15 +108,15 @@ func minDiceNeededForGame(s string, ch chan int) {
 	}
 	pow := r * g * b
 	fmt.Printf("Game %+v is valid needs %v red, %v green and %v blue cubes: %v\n", game, r, g, b, pow)
-	ch <- pow
+	return pow
 }
 
 func Problem1(filename string) int {
-	return internal.SumSolver(filename, validateGame)
+	return internal.FileSumSolver(filename, validateGame)
 }
 
 func Problem2(filename string) int {
-	return internal.SumSolver(filename, minDiceNeededForGame)
+	return internal.FileSumSolver(filename, minDiceNeededForGame)
 }
 
 func main() {

@@ -66,20 +66,19 @@ func (c *Card) Score() (int, string) {
 	return 0, fmt.Sprintf("No wins on %+v: 0", *c)
 }
 
-func getScore(s string, ch chan int) {
+func getScore(s string) int {
 	card, err := cardFromString(s)
 	if err != nil {
 		fmt.Println(err)
-		ch <- 0
-		return
+		return 0
 	}
 	score, message := card.Score()
 	fmt.Println(message)
-	ch <- score
+	return score
 }
 
 func Problem1(filename string) int {
-	return internal.SumSolver(filename, getScore)
+	return internal.FileSumSolver(filename, getScore)
 }
 
 func Problem2(filename string) int {

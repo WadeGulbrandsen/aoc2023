@@ -77,7 +77,7 @@ func getRacesFromFile(filename string) []Race {
 }
 
 func Problem1(filename string) int {
-	defer internal.Un(internal.Trace("Problem1"))
+	defer internal.EndTimer(internal.StartTimer("Problem1"))
 	races := getRacesFromFile(filename)
 	var results []int
 	for _, r := range races {
@@ -110,7 +110,7 @@ func onlyDigits(s string) int {
 }
 
 func Problem2(filename string) int {
-	defer internal.Un(internal.Trace("Problem2"))
+	defer internal.EndTimer(internal.StartTimer("Problem2"))
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)

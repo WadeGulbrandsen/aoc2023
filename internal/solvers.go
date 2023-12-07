@@ -1,35 +1,32 @@
 package internal
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-)
-
-func SumSolver(filename string, fn func(string, chan int)) int {
-	fmt.Printf("Opening %v\n", filename)
-	readFile, err := os.Open(filename)
-
-	if err != nil {
-		fmt.Println(err)
-		return 0
+func ChannelFunc[T any, V any](fn func(T) V) func(T, chan V) {
+	new_fn := func(x T, ch chan V) {
+		ch <- fn(x)
 	}
+	return new_fn
+}
 
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
+func ReduceSolver[T any](data *[]T, fn func(T) int, op func(int, int) int, init int) int {
+	result := init
 	ch := make(chan int)
-
-	l := 0
-	for fileScanner.Scan() {
-		go fn(fileScanner.Text(), ch)
-		l++
+	for _, x := range *data {
+		go ChannelFunc(fn)(x, ch)
 	}
-	readFile.Close()
-
-	sum := 0
-	for i := 0; i < l; i++ {
-		sum += <-ch
+	for i := 0; i < len(*data); i++ {
+		result = op(result, <-ch)
 	}
+	return result
+}
 
-	return sum
+func FileSumSolver(filename string, fn func(string) int) int {
+	data := FileToLines(filename)
+	return SumSolver(&data, fn)
+}
+
+func SumSolver[T any](data *[]T, fn func(T) int) int {
+	sum := func(a, b int) int {
+		return a + b
+	}
+	return ReduceSolver(data, fn, sum, 0)
 }

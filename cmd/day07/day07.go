@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"cmp"
-	"fmt"
-	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -163,28 +160,16 @@ func stringToHand(s string, fn func(string) HandStrength) Hand {
 	return Hand{}
 }
 
-func fileToHandList(filename string, fn func(string) HandStrength) HandList {
-	readFile, err := os.Open(filename)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-
+func linesToHandList(data *[]string, fn func(string) HandStrength) HandList {
 	ch := make(chan Hand)
-	l := 0
-	for fileScanner.Scan() {
+	for _, line := range *data {
 		go func(s string, c chan Hand) {
 			c <- stringToHand(s, fn)
-		}(fileScanner.Text(), ch)
-		l++
+		}(line, ch)
 	}
-	readFile.Close()
 
 	var hl HandList
-	for i := 0; i < l; i++ {
+	for i := 0; i < len(*data); i++ {
 		h := <-ch
 		if len(h.cards) == 5 {
 			hl = append(hl, h)
@@ -193,9 +178,8 @@ func fileToHandList(filename string, fn func(string) HandStrength) HandList {
 	return hl
 }
 
-func Problem1(filename string) int {
-	defer internal.Un(internal.Trace(fmt.Sprintf("Day %v Problem1 with %v", Day, filename)))
-	hl := fileToHandList(filename, stringToHandStrength)
+func Problem1(data *[]string) int {
+	hl := linesToHandList(data, stringToHandStrength)
 	hl.Sort()
 	sum := 0
 	for i, h := range hl {
@@ -204,9 +188,8 @@ func Problem1(filename string) int {
 	return sum
 }
 
-func Problem2(filename string) int {
-	defer internal.Un(internal.Trace(fmt.Sprintf("Day %v Problem2 with %v", Day, filename)))
-	hl := fileToHandList(filename, stringToHandStrengthWithJokers)
+func Problem2(data *[]string) int {
+	hl := linesToHandList(data, stringToHandStrengthWithJokers)
 	slices.SortFunc(hl, cmpHandsWithJokers)
 	sum := 0
 	for i, h := range hl {
@@ -216,8 +199,5 @@ func Problem2(filename string) int {
 }
 
 func main() {
-	filename := "input.txt"
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day %v, Problem 1 is: %v\n\n", Day, Problem1(filename))
-	fmt.Printf("\nThe answer for Day %v, Problem 2 is: %v\n\n", Day, Problem2(filename))
+	internal.SolutionRunner(Day, Problem1, Problem2)
 }

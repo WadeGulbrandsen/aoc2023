@@ -22,26 +22,24 @@ var number_names = map[string]int{
 	"nine":  9,
 }
 
-func getNumber(s string, ch chan int) {
+func getNumber(s string) int {
 	first := strings.IndexFunc(s, unicode.IsDigit)
 	last := strings.LastIndexFunc(s, unicode.IsDigit)
 	if first < 0 || last < 0 {
 		fmt.Printf("No digits in %v", s)
-		ch <- 0
-		return
+		return 0
 	}
 	sn := fmt.Sprintf("%s%s", string(s[first]), string(s[last]))
 	v, err := strconv.Atoi(sn)
 	if err != nil {
 		fmt.Println(err)
-		ch <- 0
-		return
+		return 0
 	}
 	fmt.Printf(" %v found in %v\n", v, s)
-	ch <- v
+	return v
 }
 
-func getNumberWithWords(s string, ch chan int) {
+func getNumberWithWords(s string) int {
 	first_index := math.MaxInt
 	last_index := -1
 	first_int, last_int := 0, 0
@@ -75,15 +73,15 @@ func getNumberWithWords(s string, ch chan int) {
 	}
 	value := (first_int * 10) + last_int
 	fmt.Printf(" %v found in %v\n", value, s)
-	ch <- value
+	return value
 }
 
 func Problem1(filename string) int {
-	return internal.SumSolver(filename, getNumber)
+	return internal.FileSumSolver(filename, getNumber)
 }
 
 func Problem2(filename string) int {
-	return internal.SumSolver(filename, getNumberWithWords)
+	return internal.FileSumSolver(filename, getNumberWithWords)
 }
 
 func main() {
