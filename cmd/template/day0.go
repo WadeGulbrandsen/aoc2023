@@ -1,14 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/WadeGulbrandsen/aoc2023/internal"
+)
 
 const Day = 0
 
 func Problem1(filename string) int {
+	defer internal.Un(internal.Trace(fmt.Sprintf("Day %v Problem1 with %v", Day, filename)))
 	return 0
 }
 
 func Problem2(filename string) int {
+	defer internal.Un(internal.Trace(fmt.Sprintf("Day %v Problem1 with %v", Day, filename)))
 	return 0
 }
 

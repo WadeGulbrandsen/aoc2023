@@ -7,10 +7,10 @@ import (
 )
 
 // Answers
-const p1sample = 0
-const p1input = 0
-const p2sample = 0
-const p2input = 0
+const p1sample = 6440
+const p1input = 250474325
+const p2sample = 5905
+const p2input = 248909434
 
 func TestSolutions(t *testing.T) {
 	t.Run(fmt.Sprintf("Day %v Problem1 with sample.txt", Day), func(t *testing.T) {
