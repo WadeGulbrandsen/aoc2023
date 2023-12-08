@@ -36,7 +36,7 @@ func Problem1(data *[]string) int {
 		n := stringToNode(s)
 		nodes[n.name] = n
 	}
-	log.Debug().Str("directions", directions).Int("nodes", len(nodes)).Msg("Configuration loaded")
+	log.Debug().Int("directions", len(directions)).Int("nodes", len(nodes)).Msg("Configuration loaded")
 	c := "AAA"
 	cycler := iterium.Cycle(iterium.New(strings.Split(directions, "")...))
 	i := 0
@@ -53,36 +53,26 @@ func Problem1(data *[]string) int {
 	return i
 }
 
-type cyclePosition struct {
-	node string
-	step int
-}
-
-func trackCycles(node string, nodes *map[string]Node, directions string) int {
+func findFirstZ(start string, nodes *map[string]Node, directions string) int {
 	cycler := iterium.Cycle(iterium.New(strings.Split(directions, "")...))
-	tracker := make(map[cyclePosition]int)
-	c := node
+	next := (*nodes)[start]
 	i := 0
-	for {
-		n := (*nodes)[c]
-		cp := cyclePosition{c, i % len(directions)}
-		if last_seen := (tracker)[cp]; last_seen != 0 {
-			return i - last_seen
-		}
-		tracker[cp] = i
+	for !next.ends_in_z {
 		d, _ := cycler.Next()
 		if d == "R" {
-			c = n.right
+			next = (*nodes)[next.right]
 		} else {
-			c = n.left
+			next = (*nodes)[next.left]
 		}
 		i++
 	}
+	return i
 }
 
 func Problem2(data *[]string) int {
 	directions := strings.TrimSpace((*data)[0])
 	nodes := make(map[string]Node)
+
 	var current []string
 	for _, s := range (*data)[2:] {
 		n := stringToNode(s)
@@ -91,13 +81,10 @@ func Problem2(data *[]string) int {
 			current = append(current, n.name)
 		}
 	}
-	cycle_sizes := make(map[string]int)
-	for _, c := range current {
-		cycle_sizes[c] = trackCycles(c, &nodes, directions)
-	}
-	lcm := 1
-	for _, v := range cycle_sizes {
-		lcm = internal.LCM(lcm, v)
+
+	lcm := findFirstZ(current[0], &nodes, directions)
+	for _, v := range current[1:] {
+		lcm = internal.LCM(lcm, findFirstZ(v, &nodes, directions))
 	}
 	return lcm
 }

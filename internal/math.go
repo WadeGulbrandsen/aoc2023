@@ -26,3 +26,7 @@ func Quadratic(a, b, c float64) (float64, float64, error) {
 	x2 := (-b - rooted) / (2 * a)
 	return x1, x2, nil
 }
+
+func DivMod(x, y int) (int, int) {
+	return x / y, x % y
+}
