@@ -34,17 +34,6 @@ import (
 
 const Day = 6
 
-func Quadratic(a, b, c float64) (float64, float64, error) {
-	discriminant := (b * b) - (4 * a * c)
-	rooted := math.Sqrt(discriminant)
-	if math.IsNaN(rooted) {
-		return math.NaN(), math.NaN(), fmt.Errorf("discriinant is less than zero: %v^2 - 4(%v)(%v) = %v", b, a, c, discriminant)
-	}
-	x1 := (-b + rooted) / (2 * a)
-	x2 := (-b - rooted) / (2 * a)
-	return x1, x2, nil
-}
-
 type Race struct {
 	time, distance int
 }
@@ -77,7 +66,7 @@ func Problem1(data *[]string) int {
 	races := getRacesFromStrings(data)
 	var results []int
 	for _, r := range races {
-		if x1, x2, err := Quadratic(1, -float64(r.time), float64(r.distance)); err == nil {
+		if x1, x2, err := internal.Quadratic(1, -float64(r.time), float64(r.distance)); err == nil {
 			h := math.Ceil(max(x1, x2)) - 1
 			l := math.Floor(min(x1, x2)) + 1
 			diff := h - l
@@ -111,7 +100,7 @@ func Problem2(data *[]string) int {
 	}
 	times, distances := (*data)[0], (*data)[1]
 	b, c := onlyDigits(times), onlyDigits(distances)
-	if x1, x2, err := Quadratic(1, -float64(b), float64(c)); err == nil {
+	if x1, x2, err := internal.Quadratic(1, -float64(b), float64(c)); err == nil {
 		h := math.Ceil(max(x1, x2)) - 1
 		l := math.Floor(min(x1, x2)) + 1
 		diff := h - l
