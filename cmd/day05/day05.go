@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"fmt"
 	"math"
-	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -12,6 +11,8 @@ import (
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
+
+const Day = 5
 
 var steps = []string{
 	"seed-to-soil",
@@ -139,13 +140,10 @@ func getRangeMaps(s string) []RangeMap {
 	return r
 }
 
-func fileToAlmanac(filename string, a *Almanac) {
+func sliceToAlmanac(data *[]string, a *Almanac) {
 	var wg sync.WaitGroup
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	sections := strings.Split(string(data), "\n\n")
+
+	sections := strings.Split(string(strings.Join(*data, "\n")), "\n\n")
 	for _, s := range sections {
 		title, body, found := strings.Cut(s, ":")
 		if found {
@@ -170,10 +168,9 @@ func fileToAlmanac(filename string, a *Almanac) {
 	wg.Wait()
 }
 
-func Problem1(filename string) int {
-	defer internal.EndTimer(internal.StartTimer("Problem1"))
+func Problem1(data *[]string) int {
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
-	fileToAlmanac(filename, &almanac)
+	sliceToAlmanac(data, &almanac)
 	seeds := almanac.seeds
 	location := math.MaxInt
 	ch := make(chan int)
@@ -247,10 +244,9 @@ func getLocationRangesFromSeedRanges(a *Almanac, r RangeList, step int) RangeLis
 	return getLocationRangesFromSeedRanges(a, next, step+1)
 }
 
-func Problem2(filename string) int {
-	defer internal.EndTimer(internal.StartTimer("Problem2 (Now with ranges!)"))
+func Problem2(data *[]string) int {
 	almanac := Almanac{maps: make(map[string][]RangeMap)}
-	fileToAlmanac(filename, &almanac)
+	sliceToAlmanac(data, &almanac)
 	seeds := almanac.seeds
 	var ranges RangeList
 	for i := 0; i < len(seeds); i += 2 {
@@ -265,8 +261,5 @@ func Problem2(filename string) int {
 }
 
 func main() {
-	filename := "input.txt"
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day 05, Problem 1 is: %v\n\n", Problem1(filename))
-	fmt.Printf("\nThe answer for Day 05, Problem 2 is: %v\n\n", Problem2(filename))
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

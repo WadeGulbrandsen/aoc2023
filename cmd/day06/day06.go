@@ -25,13 +25,14 @@ package main
 import (
 	"fmt"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
+
+const Day = 6
 
 func Quadratic(a, b, c float64) (float64, float64, error) {
 	discriminant := (b * b) - (4 * a * c)
@@ -58,16 +59,12 @@ func getIntsFromString(s string) []int {
 	return ints
 }
 
-func getRacesFromFile(filename string) []Race {
+func getRacesFromStrings(data *[]string) []Race {
 	var r []Race
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		panic(err)
+	if len(*data) != 2 {
+		panic(fmt.Errorf("there should be 2 lines but found %v", len(*data)))
 	}
-	times, distances, found := strings.Cut(string(data), "\n")
-	if !found {
-		panic(fmt.Errorf("couldn't split data into lines"))
-	}
+	times, distances := (*data)[0], (*data)[1]
 	if t, d := getIntsFromString(times), getIntsFromString(distances); t != nil && d != nil && len(t) == len(d) {
 		for i, time := range t {
 			r = append(r, Race{time, d[i]})
@@ -76,9 +73,8 @@ func getRacesFromFile(filename string) []Race {
 	return r
 }
 
-func Problem1(filename string) int {
-	defer internal.EndTimer(internal.StartTimer("Problem1"))
-	races := getRacesFromFile(filename)
+func Problem1(data *[]string) int {
+	races := getRacesFromStrings(data)
 	var results []int
 	for _, r := range races {
 		if x1, x2, err := Quadratic(1, -float64(r.time), float64(r.distance)); err == nil {
@@ -109,16 +105,11 @@ func onlyDigits(s string) int {
 	return -1
 }
 
-func Problem2(filename string) int {
-	defer internal.EndTimer(internal.StartTimer("Problem2"))
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		panic(err)
+func Problem2(data *[]string) int {
+	if len(*data) != 2 {
+		panic(fmt.Errorf("there should be 2 lines but found %v", len(*data)))
 	}
-	times, distances, found := strings.Cut(string(data), "\n")
-	if !found {
-		panic(fmt.Errorf("couldn't split data into lines"))
-	}
+	times, distances := (*data)[0], (*data)[1]
 	b, c := onlyDigits(times), onlyDigits(distances)
 	if x1, x2, err := Quadratic(1, -float64(b), float64(c)); err == nil {
 		h := math.Ceil(max(x1, x2)) - 1
@@ -130,8 +121,5 @@ func Problem2(filename string) int {
 }
 
 func main() {
-	filename := "input.txt"
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day 06, Problem 1 is: %v\n\n", Problem1(filename))
-	fmt.Printf("\nThe answer for Day 06, Problem 2 is: %v\n\n", Problem2(filename))
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

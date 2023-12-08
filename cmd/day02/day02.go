@@ -8,6 +8,8 @@ import (
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
 
+const Day = 2
+
 type Hand struct {
 	red, green, blue int
 }
@@ -111,16 +113,14 @@ func minDiceNeededForGame(s string) int {
 	return pow
 }
 
-func Problem1(filename string) int {
-	return internal.FileSumSolver(filename, validateGame)
+func Problem1(data *[]string) int {
+	return internal.SumSolver(data, validateGame)
 }
 
-func Problem2(filename string) int {
-	return internal.FileSumSolver(filename, minDiceNeededForGame)
+func Problem2(data *[]string) int {
+	return internal.SumSolver(data, minDiceNeededForGame)
 }
 
 func main() {
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day 02, Problem 1 is: %v\n\n", Problem1("input.txt"))
-	fmt.Printf("\nThe answer for Day 02, Problem 2 is: %v\n\n", Problem2("input.txt"))
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

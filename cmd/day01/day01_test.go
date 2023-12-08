@@ -1,31 +1,48 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"testing"
+
+	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-func TestDay01(t *testing.T) {
-	t.Run("Problem1 with sample.txt", func(t *testing.T) {
-		if a, r := 142, Problem1("sample.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run("Problem1 with input.txt", func(t *testing.T) {
-		if a, r := 54708, Problem1("input.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run("Problem2 with sample2.txt", func(t *testing.T) {
-		if a, r := 281, Problem2("sample2.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run("Problem2 with input.txt", func(t *testing.T) {
-		if a, r := 54087, Problem2("input.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
+// Answers
+const ans1sample = 142
+const ans1input = 54708
+const ans2sample = 281
+const ans2input = 54087
+
+// filenames
+const file1sample = "sample.txt"
+const file1input = "input.txt"
+const file2sample = "sample2.txt"
+const file2input = file1input
+
+func TestSolutions(t *testing.T) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	testCases := []struct {
+		problem  int
+		answer   int
+		filename string
+		fn       func(*[]string) int
+	}{
+		{1, ans1sample, file1sample, Problem1},
+		{1, ans1input, file1input, Problem1},
+		{2, ans2sample, file2sample, Problem2},
+		{2, ans2input, file2input, Problem2},
+	}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Day %v Problem %v with %v", Day, tc.problem, tc.filename), func(t *testing.T) {
+			data := internal.FileToLines(tc.filename)
+			if r := tc.fn(&data); tc.answer != r {
+				t.Fatalf("The correct answer is %v but received %v", tc.answer, r)
+			}
+		})
+	}
 }
 
 func TestGetNumber(t *testing.T) {

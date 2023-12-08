@@ -1,14 +1,15 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"slices"
 	"strconv"
 	"sync"
 	"unicode"
+
+	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
+
+const Day = 3
 
 type Point struct {
 	X, Y int
@@ -139,33 +140,18 @@ func parseLineToGrid(line string, y int, g *Grid, wg *sync.WaitGroup) {
 	g.lock.Unlock()
 }
 
-func fileToGrid(filename string) *Grid {
+func sliceToGrid(data *[]string) *Grid {
 	var wg sync.WaitGroup
-	fmt.Printf("Opening %v\n", filename)
-	readFile, err := os.Open(filename)
-
 	g := Grid{symbols: make(map[Point]rune), digits: make(map[Point]rune)}
 
-	if err != nil {
-		fmt.Println(err)
-		return &g
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	l := 0
-	for fileScanner.Scan() {
+	for i, s := range *data {
 		wg.Add(1)
-		go parseLineToGrid(fileScanner.Text(), l, &g, &wg)
-		l++
+		go parseLineToGrid(s, i, &g, &wg)
 	}
-
-	readFile.Close()
-
 	wg.Wait()
 
 	g.lock.Lock()
-	g.size.Y = l
+	g.size.Y = len(*data)
 	g.lock.Unlock()
 
 	return &g
@@ -181,10 +167,9 @@ func numBySymbol(num NumOnGrid, ch chan int) {
 	ch <- 0
 }
 
-func Problem1(filename string) int {
+func Problem1(data *[]string) int {
 	sum := 0
-	g := fileToGrid(filename)
-	fmt.Println(g)
+	g := sliceToGrid(data)
 	g.lock.RLock()
 	ch := make(chan int)
 	l := len(g.numbers)
@@ -216,10 +201,9 @@ func getGearRatio(p Point, g *Grid, ch chan int) {
 	ch <- 0
 }
 
-func Problem2(filename string) int {
+func Problem2(data *[]string) int {
 	sum := 0
-	g := fileToGrid(filename)
-	fmt.Println(g)
+	g := sliceToGrid(data)
 	g.lock.RLock()
 	ch := make(chan int)
 	l := 0
@@ -239,7 +223,5 @@ func Problem2(filename string) int {
 }
 
 func main() {
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day 03, Problem 1 is: %v\n\n", Problem1("input.txt"))
-	fmt.Printf("\nThe answer for Day 03, Problem 2 is: %v\n\n", Problem2("input.txt"))
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

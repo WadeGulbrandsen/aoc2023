@@ -1,15 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
+
+const Day = 4
 
 type Card struct {
 	id              int
@@ -77,24 +77,15 @@ func getScore(s string) int {
 	return score
 }
 
-func Problem1(filename string) int {
-	return internal.FileSumSolver(filename, getScore)
+func Problem1(data *[]string) int {
+	return internal.SumSolver(data, getScore)
 }
 
-func Problem2(filename string) int {
+func Problem2(data *[]string) int {
 	copies := make(map[int]int)
-	fmt.Printf("Opening %v\n", filename)
-	readFile, err := os.Open(filename)
 
-	if err != nil {
-		fmt.Println(err)
-		return 0
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	for fileScanner.Scan() {
-		if card, err := cardFromString(fileScanner.Text()); err == nil {
+	for _, s := range *data {
+		if card, err := cardFromString(s); err == nil {
 			copies[card.id]++
 			wins := card.Play()
 			for i := 1; i <= wins; i++ {
@@ -102,7 +93,6 @@ func Problem2(filename string) int {
 			}
 		}
 	}
-	readFile.Close()
 
 	sum := 0
 	for _, v := range copies {
@@ -112,7 +102,5 @@ func Problem2(filename string) int {
 }
 
 func main() {
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day 04, Problem 1 is: %v\n\n", Problem1("input.txt"))
-	fmt.Printf("\nThe answer for Day 04, Problem 2 is: %v\n\n", Problem2("input.txt"))
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

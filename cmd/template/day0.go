@@ -15,5 +15,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.SolutionRunner(Day, Problem1, Problem2)
+	internal.RunSolutions(Day, Problem1, Problem2, "sample.txt", "sample.txt", -1)
 }

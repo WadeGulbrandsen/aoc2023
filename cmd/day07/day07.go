@@ -199,5 +199,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.SolutionRunner(Day, Problem1, Problem2)
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

@@ -4,37 +4,45 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Answers
-const p1sample = 288
-const p1input = 4403592
-const p2sample = 71503
-const p2input = 38017587
+const ans1sample = 288
+const ans1input = 4403592
+const ans2sample = 71503
+const ans2input = 38017587
 
-const day = 6
+// filenames
+const file1sample = "sample.txt"
+const file1input = "input.txt"
+const file2sample = file1sample
+const file2input = file1input
 
 func TestSolutions(t *testing.T) {
-	t.Run(fmt.Sprintf("Day %v Problem1 with sample.txt", day), func(t *testing.T) {
-		if a, r := p1sample, Problem1("sample.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run(fmt.Sprintf("Day %v Problem1 with input.txt", day), func(t *testing.T) {
-		if a, r := p1input, Problem1("input.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run(fmt.Sprintf("Day %v Problem2 with sample.txt", day), func(t *testing.T) {
-		if a, r := p2sample, Problem2("sample.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run(fmt.Sprintf("Day %v Problem2 with input.txt", day), func(t *testing.T) {
-		if a, r := p2input, Problem2("input.txt"); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	testCases := []struct {
+		problem  int
+		answer   int
+		filename string
+		fn       func(*[]string) int
+	}{
+		{1, ans1sample, file1sample, Problem1},
+		{1, ans1input, file1input, Problem1},
+		{2, ans2sample, file2sample, Problem2},
+		{2, ans2input, file2input, Problem2},
+	}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Day %v Problem %v with %v", Day, tc.problem, tc.filename), func(t *testing.T) {
+			data := internal.FileToLines(tc.filename)
+			if r := tc.fn(&data); tc.answer != r {
+				t.Fatalf("The correct answer is %v but received %v", tc.answer, r)
+			}
+		})
+	}
 }
 
 func TestMain(m *testing.M) {

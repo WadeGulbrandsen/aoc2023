@@ -10,6 +10,8 @@ import (
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
 
+const Day = 1
+
 var number_names = map[string]int{
 	"one":   1,
 	"two":   2,
@@ -76,16 +78,14 @@ func getNumberWithWords(s string) int {
 	return value
 }
 
-func Problem1(filename string) int {
-	return internal.FileSumSolver(filename, getNumber)
+func Problem1(data *[]string) int {
+	return internal.SumSolver(data, getNumber)
 }
 
-func Problem2(filename string) int {
-	return internal.FileSumSolver(filename, getNumberWithWords)
+func Problem2(data *[]string) int {
+	return internal.SumSolver(data, getNumberWithWords)
 }
 
 func main() {
-	fmt.Println("Advent of Code 2023")
-	fmt.Printf("\nThe answer for Day 01, Problem 1 is: %v\n\n", Problem1("input.txt"))
-	fmt.Printf("\nThe answer for Day 01, Problem 2 is: %v\n\n", Problem2("input.txt"))
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

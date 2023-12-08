@@ -6,37 +6,43 @@ import (
 	"testing"
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Answers
-const p1sample = 6440
-const p1input = 250474325
-const p2sample = 5905
-const p2input = 248909434
+const ans1sample = 6440
+const ans1input = 250474325
+const ans2sample = 5905
+const ans2input = 248909434
+
+// filenames
+const file1sample = "sample.txt"
+const file1input = "input.txt"
+const file2sample = file1sample
+const file2input = file1input
 
 func TestSolutions(t *testing.T) {
-	sample := internal.FileToLines("sample.txt")
-	input := internal.FileToLines("input.txt")
-	t.Run(fmt.Sprintf("Day %v Problem1 with sample.txt", Day), func(t *testing.T) {
-		if a, r := p1sample, Problem1(&sample); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run(fmt.Sprintf("Day %v Problem1 with input.txt", Day), func(t *testing.T) {
-		if a, r := p1input, Problem1(&input); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run(fmt.Sprintf("Day %v Problem2 with sample.txt", Day), func(t *testing.T) {
-		if a, r := p2sample, Problem2(&sample); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
-	t.Run(fmt.Sprintf("Day %v Problem2 with input.txt", Day), func(t *testing.T) {
-		if a, r := p2input, Problem2(&input); a != r {
-			t.Fatalf("The correct answer is %v but received %v", a, r)
-		}
-	})
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	testCases := []struct {
+		problem  int
+		answer   int
+		filename string
+		fn       func(*[]string) int
+	}{
+		{1, ans1sample, file1sample, Problem1},
+		{1, ans1input, file1input, Problem1},
+		{2, ans2sample, file2sample, Problem2},
+		{2, ans2input, file2input, Problem2},
+	}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Day %v Problem %v with %v", Day, tc.problem, tc.filename), func(t *testing.T) {
+			data := internal.FileToLines(tc.filename)
+			if r := tc.fn(&data); tc.answer != r {
+				t.Fatalf("The correct answer is %v but received %v", tc.answer, r)
+			}
+		})
+	}
 }
 
 func TestMain(m *testing.M) {
