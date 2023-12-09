@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -92,4 +94,14 @@ func RunSolutions[T any](day int, p1, p2 func(*[]string) T, f1 string, f2 string
 func CmdSolutionRunner[T any](day int, p1, p2 func(*[]string) T) {
 	filename, loglevel := GetArgs()
 	RunSolutions(day, p1, p2, filename, filename, loglevel)
+}
+
+func GetIntsFromString(s string) []int {
+	var ints []int
+	for _, x := range strings.Split(s, " ") {
+		if v, err := strconv.Atoi(strings.TrimSpace(x)); err == nil {
+			ints = append(ints, v)
+		}
+	}
+	return ints
 }
