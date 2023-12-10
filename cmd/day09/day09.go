@@ -23,7 +23,7 @@ func nextItemInHistory(s string) int {
 	steps := [][]int{history}
 	for {
 		next := getNextStep(&steps[len(steps)-1])
-		if internal.All(next, isZero) {
+		if internal.All(&next, isZero) {
 			next = append(next, 0)
 			steps = append(steps, next)
 			break
@@ -31,10 +31,10 @@ func nextItemInHistory(s string) int {
 		steps = append(steps, next)
 	}
 	for i := len(steps) - 2; i >= 0; i-- {
-		x, y := internal.Last(steps[i]), internal.Last(steps[i+1])
+		x, y := internal.Last(&steps[i]), internal.Last(&steps[i+1])
 		steps[i] = append(steps[i], x+y)
 	}
-	return internal.Last(steps[0])
+	return internal.Last(&steps[0])
 }
 
 func prevItemInHistory(s string) int {
@@ -42,7 +42,7 @@ func prevItemInHistory(s string) int {
 	steps := [][]int{history}
 	for {
 		next := getNextStep(&steps[len(steps)-1])
-		if internal.All(next, isZero) {
+		if internal.All(&next, isZero) {
 			next = append(next, 0)
 			steps = append(steps, next)
 			break
