@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"image"
+	"image/gif"
 	"os"
 	"strconv"
 	"strings"
@@ -104,4 +106,31 @@ func GetIntsFromString(s string) []int {
 		}
 	}
 	return ints
+}
+
+func WriteGif(img *image.Paletted, filename string) {
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer f.Close()
+	gif.Encode(f, img, &gif.Options{NumColors: 256})
+}
+
+func WriteAGif(images *[]*image.Paletted, delays *[]int, filename string) {
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer f.Close()
+	err = gif.EncodeAll(f, &gif.GIF{
+		Image: *images,
+		Delay: *delays,
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

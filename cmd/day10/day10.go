@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"slices"
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
 
 const Day = 10
+const render = false
+const showNthFrame = 100
 
 type XY struct {
 	x, y int
@@ -32,9 +35,10 @@ func (xy *XY) E() XY {
 type Pipe rune
 
 type PipeMaze struct {
-	start XY
-	size  XY
-	tiles map[XY]Pipe
+	start    XY
+	size     XY
+	tiles    map[XY]Pipe
+	expanded bool
 }
 
 func (pm PipeMaze) String() string {
@@ -142,6 +146,9 @@ func (pm *PipeMaze) loopOnly() {
 }
 
 func (pm *PipeMaze) expand() {
+	if pm.expanded {
+		return
+	}
 	tiles := make(map[XY]Pipe)
 	for xy, r := range pm.tiles {
 		doubled := XY{xy.x * 2, xy.y * 2}
@@ -157,9 +164,13 @@ func (pm *PipeMaze) expand() {
 	}
 	pm.size = XY{pm.size.x * 2, pm.size.y * 2}
 	pm.tiles = tiles
+	pm.expanded = true
 }
 
 func (pm *PipeMaze) contract() {
+	if !pm.expanded {
+		return
+	}
 	tiles := make(map[XY]Pipe)
 	for xy, r := range pm.tiles {
 		x, xr := internal.DivMod(xy.x, 2)
@@ -170,13 +181,14 @@ func (pm *PipeMaze) contract() {
 	}
 	pm.size = XY{pm.size.x / 2, pm.size.y / 2}
 	pm.tiles = tiles
+	pm.expanded = false
 }
 
 func (pm *PipeMaze) InBounds(xy XY) bool {
 	return xy.x >= 0 && xy.x < pm.size.x && xy.y >= 0 && xy.y < pm.size.y
 }
 
-func (pm *PipeMaze) fillOutside() {
+func (pm *PipeMaze) fillOutside(images *[]*image.Paletted) {
 	var to_visit []XY
 	for y := 0; y < pm.size.y; y++ {
 		for x := 0; x < pm.size.x; x++ {
@@ -188,6 +200,7 @@ func (pm *PipeMaze) fillOutside() {
 			}
 		}
 	}
+	frame := 0
 	for len(to_visit) != 0 {
 		xy := to_visit[0]
 		to_visit = to_visit[1:]
@@ -197,21 +210,37 @@ func (pm *PipeMaze) fillOutside() {
 				to_visit = append(to_visit, next)
 			}
 		}
+		if render && xy.x%2 == 0 && xy.y%2 == 0 {
+			frame++
+			if frame%showNthFrame == 0 {
+				*images = append(*images, drawMaze(pm))
+			}
+		}
 	}
 }
 
-func (pm *PipeMaze) FindInclosed() []XY {
+func (pm *PipeMaze) FindInclosed(images *[]*image.Paletted) []XY {
 	pm.loopOnly()
 	pm.expand()
-	pm.fillOutside()
-	pm.contract()
+	if render {
+		*images = append(*images, drawMaze(pm))
+	}
+	pm.fillOutside(images)
 	var inclosed []XY
+	pm.contract()
+	frame := 0
 	for y := 0; y < pm.size.y; y++ {
 		for x := 0; x < pm.size.x; x++ {
 			xy := XY{x, y}
 			if pm.At(xy) == 0 {
 				inclosed = append(inclosed, xy)
 				pm.tiles[xy] = 'I'
+				if render {
+					frame++
+					if frame%showNthFrame == 0 {
+						*images = append(*images, drawMaze(pm))
+					}
+				}
 			}
 		}
 	}
@@ -234,9 +263,16 @@ func Problem1(data *[]string) int {
 }
 
 func Problem2(data *[]string) int {
+	var images []*image.Paletted
 	maze := linesToMaze(data)
-	inclosed := maze.FindInclosed()
+	inclosed := maze.FindInclosed(&images)
 	fmt.Println(maze)
+	if render {
+		images = append(images, drawMaze(&maze))
+		delays := make([]int, len(images))
+		delays[0], delays[len(delays)-1] = 100, 100
+		internal.WriteAGif(&images, &delays, "problem2.gif")
+	}
 	return len(inclosed)
 }
 
