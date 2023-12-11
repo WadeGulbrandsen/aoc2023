@@ -32,5 +32,11 @@ Added an interal library for ranges since they might be useful for future proble
 | [No read locks](https://github.com/WadeGulbrandsen/aoc2023/commit/4c8d223ea4c53623d9c27d886fe2eaf41b22685e) | 471.923µs | 507.104µs | 1.281487ms | 50.185503074s |
 | [Ranges](https://github.com/WadeGulbrandsen/aoc2023/commit/3db4fcb803c12fb6c59e92d782325f3fb081a1f3) | 804.622µs | 251.19µs | 808.556µs | 658.571µs |
 
+## Day 10
+
+Made a visualization of filling the outside spaces and finding the inclosed spaces.
+
+![Day 10 Problem 2](cmd/day10/problem2.gif)
+
 ## Test Coverage
 ![Go Coverage Chart](https://github.com/WadeGulbrandsen/aoc2023/wiki/coverage-chart.svg)
