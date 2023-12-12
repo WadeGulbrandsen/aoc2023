@@ -30,3 +30,14 @@ func Quadratic(a, b, c float64) (float64, float64, error) {
 func DivMod(n, d int) (int, int) {
 	return n / d, n % d
 }
+
+func AbsDiff[T int | uint | float64](a, b T) T {
+	if a < b {
+		return b - a
+	}
+	return a - b
+}
+
+func Abs[T int | uint | float64](x T) T {
+	return AbsDiff[T](x, 0)
+}
