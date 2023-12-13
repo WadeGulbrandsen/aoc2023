@@ -98,9 +98,14 @@ func CmdSolutionRunner[T any](day int, p1, p2 func(*[]string) T) {
 	RunSolutions(day, p1, p2, filename, filename, loglevel)
 }
 
-func GetIntsFromString(s string) []int {
+func GetIntsFromString(s string, sep string) []int {
+	los := strings.Split(s, sep)
+	return GetIntsFromStrings(&los)
+}
+
+func GetIntsFromStrings(los *[]string) []int {
 	var ints []int
-	for _, x := range strings.Split(s, " ") {
+	for _, x := range *los {
 		if v, err := strconv.Atoi(strings.TrimSpace(x)); err == nil {
 			ints = append(ints, v)
 		}

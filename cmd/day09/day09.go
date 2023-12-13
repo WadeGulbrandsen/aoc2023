@@ -19,7 +19,7 @@ func isZero(x int) bool {
 }
 
 func nextItemInHistory(s string) int {
-	history := internal.GetIntsFromString(s)
+	history := internal.GetIntsFromString(s, " ")
 	steps := [][]int{history}
 	for {
 		next := getNextStep(&steps[len(steps)-1])
@@ -38,7 +38,7 @@ func nextItemInHistory(s string) int {
 }
 
 func prevItemInHistory(s string) int {
-	history := internal.GetIntsFromString(s)
+	history := internal.GetIntsFromString(s, " ")
 	steps := [][]int{history}
 	for {
 		next := getNextStep(&steps[len(steps)-1])
