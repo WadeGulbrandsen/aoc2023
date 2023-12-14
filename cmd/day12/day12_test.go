@@ -12,9 +12,9 @@ import (
 
 // Answers
 const ans1sample = 21
-const ans1input = 0
-const ans2sample = 0
-const ans2input = 0
+const ans1input = 7490
+const ans2sample = 525152
+const ans2input = 65607131946466
 
 // filenames
 const file1sample = "sample.txt"

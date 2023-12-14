@@ -1,155 +1,107 @@
 package main
 
 import (
-	"slices"
+	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 )
 
 const Day = 12
 
-type groupType string
-
-const (
-	undefined groupType = ""
-	working   groupType = "."
-	broken    groupType = "#"
-	unknown   groupType = "?"
-	mixed     groupType = "?#"
-)
-
-type group struct {
-	kind     groupType
-	contents []rune
+type countParams struct {
+	data  string
+	sizes string
 }
 
-func stringToGroups(s string) []group {
-	var groups []group
-	var current []rune
-	var kind groupType
-	new_group := func(r rune) ([]rune, groupType) {
-		var k groupType
-		switch r {
-		case '.':
-			k = working
-		case '#':
-			k = broken
-		case '?':
-			k = unknown
-		}
-		return []rune{r}, k
-	}
-	for _, r := range s {
-		switch {
-		case len(current) == 0:
-			current, kind = new_group(r)
-		case strings.ContainsRune(string(kind), r):
-			current = append(current, r)
-		case (kind == broken || kind == unknown) && strings.ContainsRune(string(mixed), r):
-			current = append(current, r)
-			kind = mixed
-		default:
-			groups = append(groups, group{kind: kind, contents: current})
-			current, kind = new_group(r)
-		}
-	}
-	groups = append(groups, group{kind: kind, contents: current})
-	return groups
+type safeCache struct {
+	lock  sync.RWMutex
+	cache map[countParams]int
 }
 
-func groupSizes(groups *[]group) []int {
-	var sizes []int
-	for _, g := range *groups {
-		switch g.kind {
-		case broken, unknown, mixed:
-			sizes = append(sizes, len(g.contents))
-		}
-	}
-	return sizes
+func (c *safeCache) Get(p *countParams) (int, bool) {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+	v, ok := c.cache[*p]
+	return v, ok
 }
 
-func findArrangements(groups []group, sizes []int, prev string) []string {
-	if len(groups) == 0 {
-		if len(sizes) == 0 {
-			return []string{prev}
-		}
-		return nil
+func (c *safeCache) Set(p *countParams, v int) {
+	c.lock.Lock()
+	c.cache[*p] = v
+	c.lock.Unlock()
+}
+
+var cache safeCache = safeCache{cache: make(map[countParams]int)}
+
+func countArrangements(data string, sizes []int) int {
+	params := countParams{data: data, sizes: fmt.Sprint(sizes)}
+	if v, ok := cache.Get(&params); ok {
+		return v
 	}
-	groups_head, groups_tail := groups[0], groups[1:]
-	switch groups_head.kind {
-	case working:
-		return findArrangements(groups_tail, sizes, prev+string(groups_head.contents))
-	case broken:
-		sizes_head, sizes_tail := sizes[0], sizes[1:]
-		if len(groups_head.contents) == sizes_head {
-			return findArrangements(groups_tail, sizes_tail, prev+string(groups_head.contents))
-		} else {
-			return nil
-		}
-	case unknown, mixed:
-		sizes_head, sizes_tail := sizes[0], sizes[1:]
-		space := len(groups_head.contents)
-		if space == sizes_head {
-			return findArrangements(groups_tail, sizes_tail, prev+strings.Repeat("#", sizes_head))
-		}
-		if space < sizes_head {
-			return nil
-		}
-		var results []string
-		groups_tail_sizes := groupSizes(&groups_tail)
-		if groups_head.kind == unknown {
-			for i := 0; i <= space-sizes_head; i++ {
-				results = append(results, findArrangements(groups_tail, sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+strings.Repeat(".", space-sizes_head-i))...)
-				if len(sizes_tail) > len(groups_tail_sizes) && internal.Sum(&sizes_tail) < internal.Sum(&groups_tail_sizes) && space-sizes_head-i-1 >= sizes_tail[0] {
-					results = append(results, findArrangements(groups_tail[1:], sizes_tail[1:], prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+"."+strings.Repeat("#", space-sizes_head-i-1))...)
-				}
+	total := internal.Sum(&sizes)
+	minimum := strings.Count(data, "#")
+	maximum := len(data) - strings.Count(data, ".")
+	result := 0
+	switch {
+	case minimum > total || maximum < total:
+		result = 0
+	case total == 0:
+		result = 1
+	case data[0] == '.':
+		result = countArrangements(data[1:], sizes)
+	case data[0] == '#':
+		size := sizes[0]
+		if !strings.ContainsRune(data[:size], '.') {
+			if size == len(data) {
+				result = 1
+				break
 			}
-		} else {
-			for i := 0; i <= space-sizes_head; i++ {
-				if i > 0 && slices.Contains(groups_head.contents[0:i+1], '#') {
-					break
-				}
-				remaining := space - sizes_head - i
-				if remaining > 0 && groups_head.contents[i+sizes_head] == '#' {
-					continue
-				}
-				switch remaining {
-				case 0:
-					results = append(results, findArrangements(groups_tail, sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head))...)
-				case 1:
-					results = append(results, findArrangements(groups_tail, sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+".")...)
-				default:
-					rest_groups := stringToGroups(string(groups_head.contents[i+sizes_head+1:]))
-					results = append(results, findArrangements(append(groups_tail, rest_groups...), sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+".")...)
-				}
+			if data[size] != '#' {
+				result = countArrangements(data[size+1:], sizes[1:])
+				break
 			}
 		}
-		return results
+		result = 0
+	default:
+		result = countArrangements(data[1:], sizes) + countArrangements("#"+data[1:], sizes)
 	}
-	return nil
+	cache.Set(&params, result)
+	return result
 }
 
-func countArrangements(s string) int {
+func parse(s string, scale int) (string, []int) {
 	before, after, found := strings.Cut(s, " ")
 	if !found {
-		return 0
+		return "", nil
 	}
-	sizes := internal.GetIntsFromString(after, ",")
-	groups := stringToGroups(before)
-	results := findArrangements(groups, sizes, "")
-	return len(results)
+	ints := internal.GetIntsFromString(after, ",")
+	data := before
+	sizes := ints
+	for i := 1; i < scale; i++ {
+		data += "?" + before
+		sizes = append(sizes, ints...)
+	}
+	return data, sizes
+}
+
+func getCount(s string) int {
+	return countArrangements(parse(s, 1))
+}
+
+func expandAndCount(s string) int {
+	return countArrangements(parse(s, 5))
 }
 
 func Problem1(data *[]string) int {
-	results := internal.Map(data, countArrangements)
-	return internal.Sum(&results)
+	return internal.SumSolver(data, getCount)
 }
 
 func Problem2(data *[]string) int {
-	return 0
+	return internal.SumSolver(data, expandAndCount)
 }
 
 func main() {
-	internal.RunSolutions(Day, Problem1, Problem2, "sample.txt", "sample.txt", -1)
+	internal.RunSolutions(Day, Problem1, Problem2, "input.txt", "input.txt", -1)
 }
