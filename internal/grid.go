@@ -34,6 +34,38 @@ func (g Grid) String() string {
 	return s
 }
 
+func (g *Grid) Rows() []string {
+	lines := make([]string, g.Size.Y)
+	for y := 0; y < g.Size.Y; y++ {
+		line := make([]rune, g.Size.X)
+		for x := 0; x < g.Size.X; x++ {
+			if c := g.At(GridPoint{X: x, Y: y}); c != 0 {
+				line[x] = c
+			} else {
+				line[x] = '.'
+			}
+		}
+		lines[y] = string(line)
+	}
+	return lines
+}
+
+func (g *Grid) Columns() []string {
+	lines := make([]string, g.Size.X)
+	for x := 0; x < g.Size.X; x++ {
+		line := make([]rune, g.Size.Y)
+		for y := 0; y < g.Size.Y; y++ {
+			if c := g.At(GridPoint{X: x, Y: y}); c != 0 {
+				line[y] = c
+			} else {
+				line[y] = '.'
+			}
+		}
+		lines[x] = string(line)
+	}
+	return lines
+}
+
 func MakeGridFromLines(lines *[]string) Grid {
 	g := Grid{Points: make(map[GridPoint]rune)}
 	g.Size.Y = len(*lines)

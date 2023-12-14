@@ -45,3 +45,20 @@ func Sum[N int | float64](data *[]N) N {
 	head, tail := (*data)[0], (*data)[1:]
 	return Reduce(&tail, func(x, y N) N { return x + y }, head)
 }
+
+func Split[T comparable](data *[]T, sep T) [][]T {
+	var results [][]T
+	var current []T
+	for _, v := range *data {
+		if v != sep {
+			current = append(current, v)
+		} else if len(current) != 0 {
+			results = append(results, current)
+			current = nil
+		}
+	}
+	if len(current) != 0 {
+		results = append(results, current)
+	}
+	return results
+}
