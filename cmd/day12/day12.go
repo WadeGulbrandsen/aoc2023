@@ -103,5 +103,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.RunSolutions(Day, Problem1, Problem2, "input.txt", "input.txt", -1)
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }
