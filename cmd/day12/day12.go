@@ -12,54 +12,12 @@ const Day = 12
 type groupType string
 
 const (
-	undefined = ""
-	working   = "."
-	broken    = "#"
-	unknown   = "?"
-	mixed     = "?#"
+	undefined groupType = ""
+	working   groupType = "."
+	broken    groupType = "#"
+	unknown   groupType = "?"
+	mixed     groupType = "?#"
 )
-
-type arrangements struct {
-	sizes  []int
-	groups []group
-	left   *arrangements
-	right  *arrangements
-}
-
-func (a *arrangements) solve() {
-	if len(a.groups) > 1 {
-		a.split()
-	}
-}
-
-func (a *arrangements) split() {
-	s := 0
-LEFT:
-	for i, g := range a.groups {
-		switch g.kind {
-		case broken:
-			s++
-		case unknown, mixed:
-			a.left = &arrangements{sizes: a.sizes[0:s], groups: a.groups[0:i]}
-			a.sizes = a.sizes[s:]
-			a.groups = a.groups[i:]
-			break LEFT
-		}
-	}
-	s = len(a.sizes)
-RIGHT:
-	for i := len(a.groups); i >= 0; i-- {
-		switch g := a.groups[i-1]; g.kind {
-		case broken:
-			s--
-		case unknown, mixed:
-			a.right = &arrangements{sizes: a.sizes[s:], groups: a.groups[i:]}
-			a.sizes = a.sizes[0:s]
-			a.groups = a.groups[0:i]
-			break RIGHT
-		}
-	}
-}
 
 type group struct {
 	kind     groupType
@@ -88,7 +46,7 @@ func stringToGroups(s string) []group {
 			current, kind = new_group(r)
 		case strings.ContainsRune(string(kind), r):
 			current = append(current, r)
-		case (kind == broken || kind == unknown) && strings.ContainsRune(mixed, r):
+		case (kind == broken || kind == unknown) && strings.ContainsRune(string(mixed), r):
 			current = append(current, r)
 			kind = mixed
 		default:
@@ -100,39 +58,87 @@ func stringToGroups(s string) []group {
 	return groups
 }
 
-func getLen[T string | []any](x T) int {
-	return len(x)
+func groupSizes(groups *[]group) []int {
+	var sizes []int
+	for _, g := range *groups {
+		switch g.kind {
+		case broken, unknown, mixed:
+			sizes = append(sizes, len(g.contents))
+		}
+	}
+	return sizes
 }
 
-func isValidArrangement(arrangement *string, sizes *[]int) bool {
-	as := strings.Split(*arrangement, ".")
-	arrangement_sizes := internal.Map(&as, getLen)
-	arrangement_sizes = slices.DeleteFunc(arrangement_sizes, func(i int) bool { return i == 0 })
-	// slices.Sort(arrangement_sizes)
-	return slices.Equal(arrangement_sizes, *sizes)
-}
-
-func allBroken(s string) bool {
-	runes := []rune(s)
-	return internal.All(&runes, func(r rune) bool { return r == '#' })
-}
-
-func findArrangements(s string) []string {
-	var results []string
-	before, after, found := strings.Cut(s, " ")
-	if !found {
+func findArrangements(groups []group, sizes []int, prev string) []string {
+	if len(groups) == 0 {
+		if len(sizes) == 0 {
+			return []string{prev}
+		}
+		return nil
+	}
+	groups_head, groups_tail := groups[0], groups[1:]
+	switch groups_head.kind {
+	case working:
+		return findArrangements(groups_tail, sizes, prev+string(groups_head.contents))
+	case broken:
+		sizes_head, sizes_tail := sizes[0], sizes[1:]
+		if len(groups_head.contents) == sizes_head {
+			return findArrangements(groups_tail, sizes_tail, prev+string(groups_head.contents))
+		} else {
+			return nil
+		}
+	case unknown, mixed:
+		sizes_head, sizes_tail := sizes[0], sizes[1:]
+		space := len(groups_head.contents)
+		if space == sizes_head {
+			return findArrangements(groups_tail, sizes_tail, prev+strings.Repeat("#", sizes_head))
+		}
+		if space < sizes_head {
+			return nil
+		}
+		var results []string
+		groups_tail_sizes := groupSizes(&groups_tail)
+		if groups_head.kind == unknown {
+			for i := 0; i <= space-sizes_head; i++ {
+				results = append(results, findArrangements(groups_tail, sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+strings.Repeat(".", space-sizes_head-i))...)
+				if len(sizes_tail) > len(groups_tail_sizes) && internal.Sum(&sizes_tail) < internal.Sum(&groups_tail_sizes) && space-sizes_head-i-1 >= sizes_tail[0] {
+					results = append(results, findArrangements(groups_tail[1:], sizes_tail[1:], prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+"."+strings.Repeat("#", space-sizes_head-i-1))...)
+				}
+			}
+		} else {
+			for i := 0; i <= space-sizes_head; i++ {
+				if i > 0 && slices.Contains(groups_head.contents[0:i+1], '#') {
+					break
+				}
+				remaining := space - sizes_head - i
+				if remaining > 0 && groups_head.contents[i+sizes_head] == '#' {
+					continue
+				}
+				switch remaining {
+				case 0:
+					results = append(results, findArrangements(groups_tail, sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head))...)
+				case 1:
+					results = append(results, findArrangements(groups_tail, sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+".")...)
+				default:
+					rest_groups := stringToGroups(string(groups_head.contents[i+sizes_head+1:]))
+					results = append(results, findArrangements(append(groups_tail, rest_groups...), sizes_tail, prev+strings.Repeat(".", i)+strings.Repeat("#", sizes_head)+".")...)
+				}
+			}
+		}
 		return results
 	}
-	sizes := internal.GetIntsFromString(after, ",")
-	groups := stringToGroups(before)
-	arrangements := arrangements{sizes: sizes, groups: groups}
-	arrangements.solve()
-	return results
+	return nil
 }
 
 func countArrangements(s string) int {
-	arrangements := findArrangements(s)
-	return len(arrangements)
+	before, after, found := strings.Cut(s, " ")
+	if !found {
+		return 0
+	}
+	sizes := internal.GetIntsFromString(after, ",")
+	groups := stringToGroups(before)
+	results := findArrangements(groups, sizes, "")
+	return len(results)
 }
 
 func Problem1(data *[]string) int {
