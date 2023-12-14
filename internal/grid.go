@@ -10,6 +10,22 @@ func (p *GridPoint) Distance(o *GridPoint) int {
 	return dx + dy
 }
 
+func (p *GridPoint) N() GridPoint {
+	return GridPoint{p.X, p.Y - 1}
+}
+
+func (p *GridPoint) S() GridPoint {
+	return GridPoint{p.X, p.Y + 1}
+}
+
+func (p *GridPoint) W() GridPoint {
+	return GridPoint{p.X - 1, p.Y}
+}
+
+func (p *GridPoint) E() GridPoint {
+	return GridPoint{p.X + 1, p.Y}
+}
+
 type Grid struct {
 	Size   GridPoint
 	Points map[GridPoint]rune
