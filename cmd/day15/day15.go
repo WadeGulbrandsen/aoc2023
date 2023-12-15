@@ -4,9 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	orderedmap "github.com/wk8/go-ordered-map"
-
 	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"goki.dev/ordmap"
 )
 
 const Day = 15
@@ -25,32 +24,30 @@ func Problem1(data *[]string) int {
 	return internal.SumSolver(&strings, hash)
 }
 
-type myInt struct {
-	val int
-}
-
 func Problem2(data *[]string) int {
-	var boxes [256]orderedmap.OrderedMap
-	for i := range boxes {
-		boxes[i] = *orderedmap.New()
-	}
+	var boxes [256]*ordmap.Map[string, int]
 	for _, s := range strings.Split(strings.Join(*data, ""), ",") {
 		if label, val, found := strings.Cut(s, "="); found {
 			if v, err := strconv.Atoi(val); err == nil {
 				box := hash(label)
-				boxes[box].Set(label, &myInt{v})
+				if boxes[box] == nil {
+					boxes[box] = ordmap.New[string, int]()
+				}
+				boxes[box].Add(label, v)
 			}
 		} else if label, found := strings.CutSuffix(s, "-"); found {
 			box := hash(label)
-			boxes[box].Delete(label)
+			if boxes[box] != nil {
+				boxes[box].DeleteKey(label)
+			}
 		}
 	}
 	sum := 0
 	for i, b := range boxes {
-		j := 1
-		for lense := b.Oldest(); lense != nil; lense = lense.Next() {
-			sum += (i + 1) * j * int(lense.Value.(*myInt).val)
-			j++
+		if b != nil {
+			for j, lense := range b.Order {
+				sum += (i + 1) * (j + 1) * lense.Val
+			}
 		}
 	}
 	return sum
