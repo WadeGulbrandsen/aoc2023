@@ -31,6 +31,10 @@ type Grid struct {
 	Points map[GridPoint]rune
 }
 
+func (g *Grid) InBounds(p GridPoint) bool {
+	return p.X >= 0 && p.X < g.Size.X && p.Y >= 0 && p.Y < g.Size.Y
+}
+
 func (g *Grid) At(p GridPoint) rune {
 	return g.Points[p]
 }
