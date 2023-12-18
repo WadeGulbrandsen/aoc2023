@@ -11,10 +11,10 @@ import (
 )
 
 // Answers
-const ans1sample = 0
-const ans1input = 0
-const ans2sample = 0
-const ans2input = 0
+const ans1sample = 102
+const ans1input = 861
+const ans2sample = 94
+const ans2input = 1037
 
 // filenames
 const file1sample = "sample.txt"

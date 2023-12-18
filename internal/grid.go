@@ -1,7 +1,101 @@
 package internal
 
+type GridDirection rune
+
+const (
+	N GridDirection = 'N'
+	E GridDirection = 'E'
+	S GridDirection = 'S'
+	W GridDirection = 'W'
+)
+
+func (d GridDirection) TurnL() GridDirection {
+	switch d {
+	case N:
+		return W
+	case E:
+		return N
+	case S:
+		return E
+	case W:
+		return S
+	}
+	return d
+}
+
+func (d GridDirection) TurnR() GridDirection {
+	switch d {
+	case N:
+		return E
+	case E:
+		return S
+	case S:
+		return W
+	case W:
+		return N
+	}
+	return d
+}
+
+func (d GridDirection) Reverse() GridDirection {
+	switch d {
+	case N:
+		return S
+	case E:
+		return W
+	case S:
+		return N
+	case W:
+		return E
+	}
+	return d
+}
+
+type GridVector struct {
+	Point     GridPoint
+	Direction GridDirection
+}
+
+func (v *GridVector) TurnL() GridVector {
+	return GridVector{v.Point, v.Direction.TurnL()}
+}
+
+func (v *GridVector) TurnR() GridVector {
+	return GridVector{v.Point, v.Direction.TurnR()}
+}
+
+func (v *GridVector) Reverse() GridVector {
+	return GridVector{v.Point, v.Direction.Reverse()}
+}
+
+func (v *GridVector) Next() GridVector {
+	return GridVector{v.Point.Move(v.Direction), v.Direction}
+}
+
+func (v *GridVector) MoveL() GridVector {
+	return GridVector{v.Point.Move(v.Direction.TurnL()), v.Direction.TurnL()}
+}
+
+func (v *GridVector) MoveR() GridVector {
+	return GridVector{v.Point.Move(v.Direction.TurnR()), v.Direction.TurnR()}
+}
+
 type GridPoint struct {
 	X, Y int
+}
+
+func (p *GridPoint) Move(d GridDirection) GridPoint {
+	switch d {
+	case N:
+		return p.N()
+	case E:
+		return p.E()
+	case S:
+		return p.S()
+	case W:
+		return p.W()
+	}
+	return *p
 }
 
 func (p *GridPoint) Distance(o *GridPoint) int {
