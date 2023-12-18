@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -39,7 +38,6 @@ func (d digPlan) Dig() internal.Grid {
 	minPoint := internal.GridPoint{X: min_x, Y: min_y}
 	maxPoint := internal.GridPoint{X: max_x + 1, Y: max_y + 1}
 	grid := internal.Grid{MinPoint: minPoint, MaxPoint: maxPoint, Points: holes}
-	// fmt.Printf("Dug perimiter\n\n%v\n\n", grid)
 	inner := &lefts
 	for p := range lefts {
 		if !grid.InBounds(p) {
@@ -47,11 +45,17 @@ func (d digPlan) Dig() internal.Grid {
 			break
 		}
 	}
-	for p, r := range *inner {
-		if _, ok := grid.Points[p]; !ok {
-			grid.Points[p] = r
+	for k := range *inner {
+		if _, ok := holes[k]; !ok {
+			grid.Fill(k, 'X')
+			break
 		}
 	}
+	// for p, r := range *inner {
+	// 	if _, ok := grid.Points[p]; !ok {
+	// 		grid.Points[p] = r
+	// 	}
+	// }
 	return grid
 }
 
@@ -94,7 +98,6 @@ func GetDigPlan(data *[]string) digPlan {
 func Problem1(data *[]string) int {
 	plan := GetDigPlan(data)
 	grid := plan.Dig()
-	fmt.Println(grid)
 	return len(grid.Points)
 }
 
@@ -103,5 +106,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.RunSolutions(Day, Problem1, Problem2, "sample.txt", "sample.txt", -1)
+	internal.RunSolutions(Day, Problem1, Problem2, "input.txt", "sample.txt", -1)
 }

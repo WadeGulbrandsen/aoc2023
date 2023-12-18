@@ -1,5 +1,9 @@
 package internal
 
+import (
+	"slices"
+)
+
 type GridDirection rune
 
 const (
@@ -132,6 +136,28 @@ func (g *Grid) InBounds(p GridPoint) bool {
 
 func (g *Grid) At(p GridPoint) rune {
 	return g.Points[p]
+}
+
+func (g *Grid) Fill(p GridPoint, r rune) {
+	to_replace := g.At(p)
+	to_check := []GridPoint{p}
+	checked := make(map[GridPoint]bool)
+	for len(to_check) > 0 {
+		point := to_check[0]
+		to_check = to_check[1:]
+		if checked[point] {
+			continue
+		}
+		checked[point] = true
+		if g.At(point) == to_replace {
+			g.Points[point] = r
+			for _, next := range [4]GridPoint{point.N(), point.E(), point.S(), point.W()} {
+				if !checked[next] && g.InBounds(next) && !slices.Contains(to_check, next) {
+					to_check = append(to_check, next)
+				}
+			}
+		}
+	}
 }
 
 func (g Grid) String() string {
