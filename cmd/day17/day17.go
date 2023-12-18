@@ -3,7 +3,6 @@ package main
 import (
 	"container/heap"
 	"math"
-	"slices"
 
 	"github.com/WadeGulbrandsen/aoc2023/internal"
 	priorityqueue "github.com/WadeGulbrandsen/aoc2023/internal/priority_queue"
@@ -22,12 +21,18 @@ type Crucible struct {
 	Point     internal.GridPoint
 	Direction internal.GridDirection
 	Traveled  int
+	Cost      int
+}
+
+func (c *Crucible) Costless() Crucible {
+	return Crucible{Point: c.Point, Direction: c.Direction, Traveled: c.Traveled}
 }
 
 func (c Crucible) Successors(g *CityGraph, min_steps, max_steps int) []Crucible {
 	var to_check []Crucible
 	if c.Traveled+1 < max_steps {
 		forward := Crucible{Point: c.Point.Move(c.Direction, 1), Direction: c.Direction, Traveled: c.Traveled + 1}
+		forward.Cost = c.Cost + g.blocks[forward.Point]
 		if g.grid.InBounds(forward.Point) {
 			to_check = append(to_check, forward)
 		}
@@ -37,10 +42,12 @@ func (c Crucible) Successors(g *CityGraph, min_steps, max_steps int) []Crucible 
 	}
 
 	left := Crucible{Point: c.Point.Move(c.Direction.TurnL(), 1), Direction: c.Direction.TurnL()}
+	left.Cost = c.Cost + g.blocks[left.Point]
 	if g.grid.InBounds(left.Point) {
 		to_check = append(to_check, left)
 	}
 	right := Crucible{Point: c.Point.Move(c.Direction.TurnR(), 1), Direction: c.Direction.TurnR()}
+	right.Cost = c.Cost + g.blocks[right.Point]
 	if g.grid.InBounds(right.Point) {
 		to_check = append(to_check, right)
 	}
@@ -118,30 +125,29 @@ func (g CityGraph) Cost(p []Crucible) int {
 	return sum
 }
 
-func findPath(g *CityGraph, min_steps, max_steps int) []Crucible {
-	pq := &priorityqueue.PriorityQueue[[]Crucible]{}
+func findPath(g *CityGraph, min_steps, max_steps int) Crucible {
+	pq := &priorityqueue.PriorityQueue[Crucible]{}
 	seen := make(map[Crucible]bool)
 	s, e := internal.GridPoint{X: 0, Y: 0}, internal.GridPoint{X: g.grid.MaxPoint.X - 1, Y: g.grid.MaxPoint.Y - 1}
 	heap.Init(pq)
-	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.E, 1), Direction: internal.E}}})
-	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.S, 1), Direction: internal.S}}})
+	east, south := s.Move(internal.E, 1), s.Move(internal.S, 1)
+	heap.Push(pq, &priorityqueue.Item[Crucible]{Value: Crucible{Point: east, Direction: internal.E, Cost: g.blocks[east]}})
+	heap.Push(pq, &priorityqueue.Item[Crucible]{Value: Crucible{Point: south, Direction: internal.S, Cost: g.blocks[south]}})
 	for i := 0; pq.Len() > 0; i++ {
-		path := heap.Pop(pq).(*priorityqueue.Item[[]Crucible]).Value
-		c := path[len(path)-1]
-		if seen[c] {
+		c := heap.Pop(pq).(*priorityqueue.Item[Crucible]).Value
+		cl := c.Costless()
+		if seen[cl] {
 			continue
 		}
-		seen[c] = true
+		seen[cl] = true
 		if c.Point == e && c.Traveled+1 >= min_steps {
-			return path
+			return c
 		}
 		for _, n := range c.Successors(g, min_steps, max_steps) {
-			np := slices.Clone(path)
-			np = append(np, n)
-			heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: np, Priority: -g.Cost(np)})
+			heap.Push(pq, &priorityqueue.Item[Crucible]{Value: n, Priority: -n.Cost})
 		}
 	}
-	return nil
+	return Crucible{}
 }
 
 func solve(data *[]string, min_steps, max_steps int) int {
@@ -152,8 +158,7 @@ func solve(data *[]string, min_steps, max_steps int) int {
 	}
 	graph := CityGraph{g, heat_map}
 	p := findPath(&graph, min_steps, max_steps)
-	// fmt.Println(graph.PrintPath(p))
-	return graph.Cost(p)
+	return p.Cost
 }
 
 func Problem1(data *[]string) int {
