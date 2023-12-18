@@ -121,12 +121,13 @@ func (p *GridPoint) E() GridPoint {
 }
 
 type Grid struct {
-	Size   GridPoint
-	Points map[GridPoint]rune
+	MinPoint GridPoint
+	MaxPoint GridPoint
+	Points   map[GridPoint]rune
 }
 
 func (g *Grid) InBounds(p GridPoint) bool {
-	return p.X >= 0 && p.X < g.Size.X && p.Y >= 0 && p.Y < g.Size.Y
+	return p.X >= g.MinPoint.X && p.X < g.MaxPoint.X && p.Y >= g.MinPoint.Y && p.Y < g.MaxPoint.Y
 }
 
 func (g *Grid) At(p GridPoint) rune {
@@ -135,8 +136,8 @@ func (g *Grid) At(p GridPoint) rune {
 
 func (g Grid) String() string {
 	s := ""
-	for y := 0; y < g.Size.Y; y++ {
-		for x := 0; x < g.Size.X; x++ {
+	for y := g.MinPoint.Y; y < g.MaxPoint.Y; y++ {
+		for x := g.MinPoint.X; x < g.MaxPoint.X; x++ {
 			r := g.At(GridPoint{x, y})
 			if r == 0 {
 				r = '.'
@@ -149,42 +150,42 @@ func (g Grid) String() string {
 }
 
 func (g *Grid) Rows() []string {
-	lines := make([]string, g.Size.Y)
-	for y := 0; y < g.Size.Y; y++ {
-		line := make([]rune, g.Size.X)
-		for x := 0; x < g.Size.X; x++ {
+	var lines []string
+	for y := g.MinPoint.Y; y < g.MaxPoint.Y; y++ {
+		line := ""
+		for x := g.MinPoint.X; x < g.MaxPoint.X; x++ {
 			if c := g.At(GridPoint{X: x, Y: y}); c != 0 {
-				line[x] = c
+				line += string(c)
 			} else {
-				line[x] = '.'
+				line += "."
 			}
 		}
-		lines[y] = string(line)
+		lines = append(lines, line)
 	}
 	return lines
 }
 
 func (g *Grid) Columns() []string {
-	lines := make([]string, g.Size.X)
-	for x := 0; x < g.Size.X; x++ {
-		line := make([]rune, g.Size.Y)
-		for y := 0; y < g.Size.Y; y++ {
+	var lines []string
+	for x := g.MinPoint.X; x < g.MaxPoint.X; x++ {
+		line := ""
+		for y := g.MinPoint.Y; y < g.MaxPoint.Y; y++ {
 			if c := g.At(GridPoint{X: x, Y: y}); c != 0 {
-				line[y] = c
+				line += string(c)
 			} else {
-				line[y] = '.'
+				line += "."
 			}
 		}
-		lines[x] = string(line)
+		lines = append(lines, line)
 	}
 	return lines
 }
 
 func MakeGridFromLines(lines *[]string) Grid {
 	g := Grid{Points: make(map[GridPoint]rune)}
-	g.Size.Y = len(*lines)
-	if g.Size.Y > 0 {
-		g.Size.X = len((*lines)[0])
+	g.MaxPoint.Y = len(*lines)
+	if g.MaxPoint.Y > 0 {
+		g.MaxPoint.X = len((*lines)[0])
 		for y, l := range *lines {
 			for x, r := range l {
 				if r != '.' {

@@ -100,12 +100,12 @@ func Problem1(data *[]string) int {
 func Problem2(data *[]string) int {
 	g := internal.MakeGridFromLines(data)
 	m := 0
-	for x := 0; x < g.Size.X; x++ {
-		l1, l2 := lazer{internal.GridPoint{X: x, Y: 0}, S}, lazer{internal.GridPoint{X: x, Y: g.Size.Y - 1}, N}
+	for x := 0; x < g.MaxPoint.X; x++ {
+		l1, l2 := lazer{internal.GridPoint{X: x, Y: 0}, S}, lazer{internal.GridPoint{X: x, Y: g.MaxPoint.Y - 1}, N}
 		m = max(m, immaFirinMahLazer(&g, l1), immaFirinMahLazer(&g, l2))
 	}
-	for y := 0; y < g.Size.Y; y++ {
-		l1, l2 := lazer{internal.GridPoint{X: 0, Y: y}, E}, lazer{internal.GridPoint{X: g.Size.X - 1, Y: y}, W}
+	for y := 0; y < g.MaxPoint.Y; y++ {
+		l1, l2 := lazer{internal.GridPoint{X: 0, Y: y}, E}, lazer{internal.GridPoint{X: g.MaxPoint.X - 1, Y: y}, W}
 		m = max(m, immaFirinMahLazer(&g, l1), immaFirinMahLazer(&g, l2))
 	}
 	return m

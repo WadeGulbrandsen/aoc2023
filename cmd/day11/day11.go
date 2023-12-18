@@ -34,8 +34,8 @@ func expandUniverse(g *internal.Grid, scale int) {
 				new_y += scale - 1
 			}
 		}
-		g.Size.X = max(g.Size.X, new_x+1)
-		g.Size.Y = max(g.Size.Y, new_y+1)
+		g.MaxPoint.X = max(g.MaxPoint.X, new_x+1)
+		g.MaxPoint.Y = max(g.MaxPoint.Y, new_y+1)
 		new_points[internal.GridPoint{X: new_x, Y: new_y}] = v
 	}
 	g.Points = new_points

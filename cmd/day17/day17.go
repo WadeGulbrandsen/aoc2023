@@ -59,8 +59,8 @@ func (g CityGraph) PrintSeen(searched map[Crucible]bool) string {
 		visited[k.Point] = true
 	}
 	s := ""
-	for y := 0; y < g.grid.Size.Y; y++ {
-		for x := 0; x < g.grid.Size.X; x++ {
+	for y := 0; y < g.grid.MaxPoint.Y; y++ {
+		for x := 0; x < g.grid.MaxPoint.X; x++ {
 			if visited[internal.GridPoint{X: x, Y: y}] {
 				s += "X"
 			} else {
@@ -96,8 +96,8 @@ func (g CityGraph) PrintPath(path []Crucible) string {
 		}
 	}
 	s := ""
-	for y := 0; y < g.grid.Size.Y; y++ {
-		for x := 0; x < g.grid.Size.X; x++ {
+	for y := 0; y < g.grid.MaxPoint.Y; y++ {
+		for x := 0; x < g.grid.MaxPoint.X; x++ {
 			p := internal.GridPoint{X: x, Y: y}
 			if r := pathmap[p]; r != 0 {
 				s += string(r)
@@ -121,7 +121,7 @@ func (g CityGraph) Cost(p []Crucible) int {
 func findPath(g *CityGraph, min_steps, max_steps int) []Crucible {
 	pq := &priorityqueue.PriorityQueue[[]Crucible]{}
 	seen := make(map[Crucible]bool)
-	s, e := internal.GridPoint{X: 0, Y: 0}, internal.GridPoint{X: g.grid.Size.X - 1, Y: g.grid.Size.Y - 1}
+	s, e := internal.GridPoint{X: 0, Y: 0}, internal.GridPoint{X: g.grid.MaxPoint.X - 1, Y: g.grid.MaxPoint.Y - 1}
 	heap.Init(pq)
 	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.E), Direction: internal.E}}})
 	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.S), Direction: internal.S}}})

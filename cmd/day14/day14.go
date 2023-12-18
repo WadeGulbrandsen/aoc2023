@@ -9,8 +9,8 @@ import (
 const Day = 14
 
 func tiltNorth(g *internal.Grid) {
-	for y := 1; y < g.Size.Y; y++ {
-		for x := 0; x < g.Size.X; x++ {
+	for y := 1; y < g.MaxPoint.Y; y++ {
+		for x := 0; x < g.MaxPoint.X; x++ {
 			pos := internal.GridPoint{X: x, Y: y}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
@@ -31,9 +31,9 @@ func tiltNorth(g *internal.Grid) {
 }
 
 func tiltEast(g *internal.Grid) {
-	for x := 1; x < g.Size.X; x++ {
-		for y := 0; y < g.Size.Y; y++ {
-			pos := internal.GridPoint{X: g.Size.X - x - 1, Y: y}
+	for x := 1; x < g.MaxPoint.X; x++ {
+		for y := 0; y < g.MaxPoint.Y; y++ {
+			pos := internal.GridPoint{X: g.MaxPoint.X - x - 1, Y: y}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
 				for i := 0; i < x; i++ {
@@ -53,9 +53,9 @@ func tiltEast(g *internal.Grid) {
 }
 
 func tiltSouth(g *internal.Grid) {
-	for y := 1; y < g.Size.Y; y++ {
-		for x := 0; x < g.Size.X; x++ {
-			pos := internal.GridPoint{X: x, Y: g.Size.Y - y - 1}
+	for y := 1; y < g.MaxPoint.Y; y++ {
+		for x := 0; x < g.MaxPoint.X; x++ {
+			pos := internal.GridPoint{X: x, Y: g.MaxPoint.Y - y - 1}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
 				for i := 0; i < y; i++ {
@@ -75,8 +75,8 @@ func tiltSouth(g *internal.Grid) {
 }
 
 func tiltWest(g *internal.Grid) {
-	for x := 1; x < g.Size.X; x++ {
-		for y := 0; y < g.Size.Y; y++ {
+	for x := 1; x < g.MaxPoint.X; x++ {
+		for y := 0; y < g.MaxPoint.Y; y++ {
 			pos := internal.GridPoint{X: x, Y: y}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
@@ -105,10 +105,10 @@ func spin(g *internal.Grid) {
 
 func calculateLoad(g *internal.Grid) int {
 	load := 0
-	for y := 0; y < g.Size.Y; y++ {
-		for x := 0; x < g.Size.X; x++ {
+	for y := 0; y < g.MaxPoint.Y; y++ {
+		for x := 0; x < g.MaxPoint.X; x++ {
 			if g.At(internal.GridPoint{X: x, Y: y}) == 'O' {
-				load += g.Size.Y - y
+				load += g.MaxPoint.Y - y
 			}
 		}
 	}
@@ -150,7 +150,7 @@ func Problem2(data *[]string) int {
 		return 0
 	}
 	idx := (1000000000 - start - 1) % length
-	end_state := internal.Grid{Size: g.Size, Points: cycle[idx]}
+	end_state := internal.Grid{MaxPoint: g.MaxPoint, Points: cycle[idx]}
 	return calculateLoad(&end_state)
 }
 
