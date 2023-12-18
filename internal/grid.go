@@ -152,7 +152,7 @@ func (g *Grid) Fill(p GridPoint, r rune) {
 		if g.At(point) == to_replace {
 			g.Points[point] = r
 			for _, next := range [4]GridPoint{point.N(), point.E(), point.S(), point.W()} {
-				if !checked[next] && g.InBounds(next) && !slices.Contains(to_check, next) {
+				if !checked[next] && g.At(next) == to_replace && g.InBounds(next) && !slices.Contains(to_check, next) {
 					to_check = append(to_check, next)
 				}
 			}
