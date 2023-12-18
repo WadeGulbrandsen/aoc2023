@@ -16,33 +16,14 @@ type digInstruction struct {
 
 type digPlan []digInstruction
 
-func (d digPlan) Dig() internal.Grid {
-	min_x, min_y, max_x, max_y := 0, 0, 0, 0
+func (d digPlan) DigTrench() []internal.GridPoint {
 	current := internal.GridPoint{X: 0, Y: 0}
-	holes := map[internal.GridPoint]rune{current: '#'}
+	trench := []internal.GridPoint{current}
 	for _, inst := range d {
-		for i := 0; i < inst.distance; i++ {
-			current = current.Move(inst.direction)
-			holes[current] = '#'
-		}
-		min_x = min(min_x, current.X)
-		max_x = max(max_x, current.X)
-		min_y = min(min_y, current.Y)
-		max_y = max(max_y, current.Y)
+		current = current.Move(inst.direction, inst.distance)
+		trench = append(trench, current)
 	}
-	minPoint := internal.GridPoint{X: min_x, Y: min_y}
-	maxPoint := internal.GridPoint{X: max_x + 1, Y: max_y + 1}
-	grid := internal.Grid{MinPoint: minPoint, MaxPoint: maxPoint, Points: holes}
-	// fmt.Print(grid)
-	for x := min_x; x < max_x; x++ {
-		c := internal.GridPoint{X: x, Y: min_y}
-		d := internal.GridPoint{X: x, Y: min_y + 1}
-		if holes[c] == '#' && holes[d] != '#' {
-			grid.Fill(d, 'X')
-			return grid
-		}
-	}
-	return grid
+	return trench
 }
 
 func standardParse(d, n string) (digInstruction, bool) {
@@ -111,8 +92,9 @@ func Solve(data *[]string, color_parse bool) int {
 			plan = append(plan, di)
 		}
 	}
-	grid := plan.Dig()
-	return len(grid.Points)
+	trench := plan.DigTrench()
+	area := internal.ShoelaceArea(trench)
+	return area
 }
 
 func Problem1(data *[]string) int {
@@ -120,9 +102,9 @@ func Problem1(data *[]string) int {
 }
 
 func Problem2(data *[]string) int {
-	return 0
+	return Solve(data, true)
 }
 
 func main() {
-	internal.RunSolutions(Day, Problem1, Problem2, "input.txt", "input.txt", -1)
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }

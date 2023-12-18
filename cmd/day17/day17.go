@@ -27,7 +27,7 @@ type Crucible struct {
 func (c Crucible) Successors(g *CityGraph, min_steps, max_steps int) []Crucible {
 	var to_check []Crucible
 	if c.Traveled+1 < max_steps {
-		forward := Crucible{Point: c.Point.Move(c.Direction), Direction: c.Direction, Traveled: c.Traveled + 1}
+		forward := Crucible{Point: c.Point.Move(c.Direction, 1), Direction: c.Direction, Traveled: c.Traveled + 1}
 		if g.grid.InBounds(forward.Point) {
 			to_check = append(to_check, forward)
 		}
@@ -36,11 +36,11 @@ func (c Crucible) Successors(g *CityGraph, min_steps, max_steps int) []Crucible 
 		return to_check
 	}
 
-	left := Crucible{Point: c.Point.Move(c.Direction.TurnL()), Direction: c.Direction.TurnL()}
+	left := Crucible{Point: c.Point.Move(c.Direction.TurnL(), 1), Direction: c.Direction.TurnL()}
 	if g.grid.InBounds(left.Point) {
 		to_check = append(to_check, left)
 	}
-	right := Crucible{Point: c.Point.Move(c.Direction.TurnR()), Direction: c.Direction.TurnR()}
+	right := Crucible{Point: c.Point.Move(c.Direction.TurnR(), 1), Direction: c.Direction.TurnR()}
 	if g.grid.InBounds(right.Point) {
 		to_check = append(to_check, right)
 	}
@@ -123,8 +123,8 @@ func findPath(g *CityGraph, min_steps, max_steps int) []Crucible {
 	seen := make(map[Crucible]bool)
 	s, e := internal.GridPoint{X: 0, Y: 0}, internal.GridPoint{X: g.grid.MaxPoint.X - 1, Y: g.grid.MaxPoint.Y - 1}
 	heap.Init(pq)
-	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.E), Direction: internal.E}}})
-	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.S), Direction: internal.S}}})
+	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.E, 1), Direction: internal.E}}})
+	heap.Push(pq, &priorityqueue.Item[[]Crucible]{Value: []Crucible{{Point: s.Move(internal.S, 1), Direction: internal.S}}})
 	for i := 0; pq.Len() > 0; i++ {
 		path := heap.Pop(pq).(*priorityqueue.Item[[]Crucible]).Value
 		c := path[len(path)-1]

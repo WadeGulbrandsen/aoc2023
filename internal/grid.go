@@ -73,31 +73,31 @@ func (v *GridVector) Reverse() GridVector {
 }
 
 func (v *GridVector) Next() GridVector {
-	return GridVector{v.Point.Move(v.Direction), v.Direction}
+	return GridVector{v.Point.Move(v.Direction, 1), v.Direction}
 }
 
 func (v *GridVector) MoveL() GridVector {
-	return GridVector{v.Point.Move(v.Direction.TurnL()), v.Direction.TurnL()}
+	return GridVector{v.Point.Move(v.Direction.TurnL(), 1), v.Direction.TurnL()}
 }
 
 func (v *GridVector) MoveR() GridVector {
-	return GridVector{v.Point.Move(v.Direction.TurnR()), v.Direction.TurnR()}
+	return GridVector{v.Point.Move(v.Direction.TurnR(), 1), v.Direction.TurnR()}
 }
 
 type GridPoint struct {
 	X, Y int
 }
 
-func (p *GridPoint) Move(d GridDirection) GridPoint {
-	switch d {
+func (p *GridPoint) Move(direction GridDirection, distance int) GridPoint {
+	switch direction {
 	case N:
-		return p.N()
+		return GridPoint{p.X, p.Y - distance}
 	case E:
-		return p.E()
+		return GridPoint{p.X + distance, p.Y}
 	case S:
-		return p.S()
+		return GridPoint{p.X, p.Y + distance}
 	case W:
-		return p.W()
+		return GridPoint{p.X - distance, p.Y}
 	}
 	return *p
 }
