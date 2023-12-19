@@ -144,7 +144,7 @@ func findPath(g *CityGraph, min_steps, max_steps int) Crucible {
 			return c
 		}
 		for _, n := range c.Successors(g, min_steps, max_steps) {
-			heap.Push(pq, &priorityqueue.Item[Crucible]{Value: n, Priority: -n.Cost})
+			heap.Push(pq, &priorityqueue.Item[Crucible]{Value: n, Priority: -(n.Cost + e.Distance(&n.Point))})
 		}
 	}
 	return Crucible{}
