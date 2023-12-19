@@ -25,6 +25,32 @@ func (r Range) IsEmpty() bool {
 	return r.Start == 0 && r.End == 0
 }
 
+func (r Range) Len() int {
+	return AbsDiff(r.Start, r.End) + 1
+}
+
+func (r Range) Contains(i int) bool {
+	return i >= r.Start && i <= r.End
+}
+
+func (r Range) Intersect(other Range) bool {
+	return r.Contains(other.Start) || r.Contains(other.End)
+}
+
+func (r Range) Adjacent(other Range) bool {
+	return r.End+1 == other.Start || other.End+1 == r.Start
+}
+
+func (r Range) Combine(other Range) (Range, bool) {
+	var combined Range
+	if r.Intersect(other) || r.Adjacent(other) {
+		combined.Start = min(r.Start, other.Start)
+		combined.End = max(r.Start, other.End)
+		return combined, true
+	}
+	return combined, false
+}
+
 func (r Range) SplitOtherRange(other Range) (Range, Range, Range) {
 	var before, contained, after Range
 	switch {
@@ -46,6 +72,20 @@ func (r Range) SplitOtherRange(other Range) (Range, Range, Range) {
 		after = Range{r.End + 1, other.End}
 	}
 	return before, contained, after
+}
+
+func (r Range) SplitAt(i int) (Range, Range) {
+	var lower, higher Range
+	switch {
+	case i <= r.Start:
+		higher = r
+	case i > r.End:
+		lower = r
+	default:
+		lower = Range{r.Start, i - 1}
+		higher = Range{i, r.End}
+	}
+	return lower, higher
 }
 
 type RangeList []Range
@@ -72,4 +112,22 @@ func (r RangeList) IsSorted() bool {
 
 func (r RangeList) FilterEmpty() RangeList {
 	return slices.DeleteFunc(r, func(r Range) bool { return r.IsEmpty() })
+}
+
+func (r *RangeList) Compact() RangeList {
+	n := slices.Clone(*r)
+	n.Sort()
+	if n.Len() < 2 {
+		return n
+	}
+	compacted := RangeList{n[0]}
+	for _, o := range n[1:] {
+		i := compacted.Len() - 1
+		if combined, e := compacted[i].Combine(o); e {
+			compacted[i] = combined
+		} else {
+			compacted = append(compacted, o)
+		}
+	}
+	return compacted
 }

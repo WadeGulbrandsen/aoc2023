@@ -1,6 +1,7 @@
 package main
 
 import (
+	"maps"
 	"regexp"
 	"strconv"
 	"strings"
@@ -11,47 +12,92 @@ import (
 
 const Day = 19
 
-var ruleMatch = regexp.MustCompile(`([xmas])([<>])(\d+):(\w+)`)
+type workflow []rule
+
+type part map[string]int
+
+type RangeMap map[string]internal.Range
+
+func (sm *RangeMap) Product() int {
+	if len(*sm) == 0 {
+		return 0
+	}
+	product := 1
+	for _, s := range *sm {
+		product *= internal.Range(s).Len()
+	}
+	return product
+}
 
 type rule struct {
-	category    rune
-	op          func(int, int) bool
+	category    string
+	op          string
 	val         int
 	destination string
 }
 
-func noop(x, y int) bool {
-	return true
-}
-
-func lt(x, y int) bool {
-	return x < y
-}
-
-func gt(x, y int) bool {
-	return x > y
-}
+var ruleMatch = regexp.MustCompile(`([xmas])([<>])(\d+):(\w+)`)
 
 func parseRule(s string) rule {
 	matches := ruleMatch.FindStringSubmatch(s)
-	op := noop
 	if matches == nil {
-		return rule{op: op, destination: s}
-	}
-	switch matches[2] {
-	case "<":
-		op = lt
-	case ">":
-		op = gt
+		return rule{category: "x", op: ">", destination: s, val: 0}
 	}
 	val, err := strconv.Atoi(matches[3])
 	if err != nil {
 		panic(err)
 	}
-	return rule{category: rune(matches[1][0]), op: op, val: val, destination: matches[4]}
+	return rule{category: matches[1], op: matches[2], val: val, destination: matches[4]}
 }
 
-type workflow []rule
+type sorter struct {
+	workflows map[string]workflow
+}
+
+func (s *sorter) AcceptPart(p part, wf string) bool {
+	workflow, ok := s.workflows[wf]
+	if !ok {
+		return wf == "A"
+	}
+	for _, rule := range workflow {
+		result := false
+		switch rule.op {
+		case "<":
+			result = p[rule.category] < rule.val
+		default:
+			result = p[rule.category] > rule.val
+		}
+		if result {
+			return s.AcceptPart(p, rule.destination)
+		}
+	}
+	return false
+}
+
+func (s *sorter) AcceptedSpans(sm RangeMap, wf string) []RangeMap {
+	workflow, ok := s.workflows[wf]
+	if !ok {
+		if wf == "A" {
+			return []RangeMap{sm}
+		}
+		return nil
+	}
+	var accepted []RangeMap
+	current := maps.Clone(sm)
+	for _, rule := range workflow {
+		next := maps.Clone(current)
+		var n, k internal.Range
+		if rule.op == "<" {
+			n, k = current[rule.category].SplitAt(rule.val)
+		} else {
+			k, n = current[rule.category].SplitAt(rule.val + 1)
+		}
+		next[rule.category] = n
+		current[rule.category] = k
+		accepted = append(accepted, s.AcceptedSpans(next, rule.destination)...)
+	}
+	return accepted
+}
 
 func parseWorkflow(s string) (string, workflow) {
 	var wf workflow
@@ -66,8 +112,6 @@ func parseWorkflow(s string) (string, workflow) {
 	return name, wf
 }
 
-type part map[rune]int
-
 func parsePart(s string) part {
 	part := make(part)
 	for _, c := range strings.Split(strings.Trim(s, "{}"), ",") {
@@ -76,45 +120,36 @@ func parsePart(s string) part {
 			if err != nil {
 				panic(err)
 			}
-			part[rune(n[0])] = val
+			part[n] = val
 		}
 	}
 	return part
 }
 
-func followWorkflows(p part, current string, workflows *map[string]workflow) bool {
-	switch current {
-	case "A":
-		return true
-	case "R":
-		return false
-	}
-	for _, rule := range (*workflows)[current] {
-		if rule.op(p[rule.category], rule.val) {
-			return followWorkflows(p, rule.destination, workflows)
-		}
-	}
-	return false
-}
-
-func Problem1(data *[]string) int {
+func parseInput(data *[]string) (sorter, []part) {
 	w, p, found := internal.Cut(data, "")
 	if !found {
-		return 0
+		return sorter{}, nil
 	}
 	workflows := make(map[string]workflow)
 	for _, wf := range w {
 		name, workflow := parseWorkflow(wf)
 		workflows[name] = workflow
 	}
+	s := sorter{workflows: workflows}
 	var parts []part
 	for _, part := range p {
 		parts = append(parts, parsePart(part))
 	}
 	log.Debug().Msgf("Found %v workflows and %v parts", len(workflows), len(parts))
+	return s, parts
+}
+
+func Problem1(data *[]string) int {
+	s, parts := parseInput(data)
 	var accepted []part
 	for _, part := range parts {
-		if followWorkflows(part, "in", &workflows) {
+		if s.AcceptPart(part, "in") {
 			accepted = append(accepted, part)
 		}
 	}
@@ -127,9 +162,21 @@ func Problem1(data *[]string) int {
 }
 
 func Problem2(data *[]string) int {
-	return 0
+	s, _ := parseInput(data)
+	sm := RangeMap{
+		"x": {Start: 1, End: 4000},
+		"m": {Start: 1, End: 4000},
+		"a": {Start: 1, End: 4000},
+		"s": {Start: 1, End: 4000},
+	}
+	accepted := s.AcceptedSpans(sm, "in")
+	sum := 0
+	for _, a := range accepted {
+		sum += a.Product()
+	}
+	return sum
 }
 
 func main() {
-	internal.RunSolutions(Day, Problem1, Problem2, "input.txt", "sample.txt", -1)
+	internal.CmdSolutionRunner(Day, Problem1, Problem2)
 }
