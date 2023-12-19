@@ -1,5 +1,7 @@
 package internal
 
+import "slices"
+
 func All[T any](data *[]T, fn func(T) bool) bool {
 	for _, item := range *data {
 		if !fn(item) {
@@ -61,4 +63,11 @@ func Split[T comparable](data *[]T, sep T) [][]T {
 		results = append(results, current)
 	}
 	return results
+}
+
+func Cut[T comparable](data *[]T, sep T) ([]T, []T, bool) {
+	if i := slices.Index(*data, sep); i != -1 {
+		return (*data)[:i], (*data)[i+1:], true
+	}
+	return *data, nil, false
 }
