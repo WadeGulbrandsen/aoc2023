@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/WadeGulbrandsen/aoc2023/internal"
-)
+import "github.com/WadeGulbrandsen/aoc2023/internal/utils"
 
 const Day = 20
 
@@ -15,5 +13,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.RunSolutions(Day, Problem1, Problem2, "sample.txt", "sample.txt", -1)
+	utils.RunSolutions(Day, Problem1, Problem2, "sample.txt", "sample.txt", -1)
 }

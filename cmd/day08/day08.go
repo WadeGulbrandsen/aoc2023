@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/mowshon/iterium"
 	"github.com/rs/zerolog/log"
 )
@@ -84,11 +84,11 @@ func Problem2(data *[]string) int {
 
 	lcm := findFirstZ(current[0], &nodes, directions)
 	for _, v := range current[1:] {
-		lcm = internal.LCM(lcm, findFirstZ(v, &nodes, directions))
+		lcm = utils.LCM(lcm, findFirstZ(v, &nodes, directions))
 	}
 	return lcm
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

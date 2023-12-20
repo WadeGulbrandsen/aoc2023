@@ -1,4 +1,8 @@
-package internal
+package solve
+
+import (
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
+)
 
 func ChannelFunc[T any, V any](fn func(T) V) func(T, chan V) {
 	new_fn := func(x T, ch chan V) {
@@ -20,7 +24,7 @@ func ReduceSolver[T any](data *[]T, fn func(T) int, op func(int, int) int, init 
 }
 
 func FileSumSolver(filename string, fn func(string) int) int {
-	data := FileToLines(filename)
+	data := utils.FileToLines(filename)
 	return SumSolver(&data, fn)
 }
 

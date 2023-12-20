@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/mowshon/iterium"
 )
 
@@ -131,13 +131,13 @@ func stringToHandStrength(s string) HandStrength {
 	case 4:
 		return OnePair
 	case 3:
-		cv := internal.GetMapValues(counts)
+		cv := utils.GetMapValues(counts)
 		if slices.Max(cv) == 3 {
 			return ThreeOfAKind
 		}
 		return TwoPair
 	case 2:
-		cv := internal.GetMapValues(counts)
+		cv := utils.GetMapValues(counts)
 		if slices.Max(cv) == 4 {
 			return FourOfAKind
 		}
@@ -199,5 +199,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

@@ -1,7 +1,9 @@
-package internal
+package grid
 
 import (
 	"slices"
+
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 type GridDirection rune
@@ -103,8 +105,8 @@ func (p *GridPoint) Move(direction GridDirection, distance int) GridPoint {
 }
 
 func (p *GridPoint) Distance(o *GridPoint) int {
-	dx := AbsDiff[int](p.X, o.X)
-	dy := AbsDiff[int](p.Y, o.Y)
+	dx := utils.AbsDiff[int](p.X, o.X)
+	dy := utils.AbsDiff[int](p.Y, o.Y)
 	return dx + dy
 }
 
@@ -221,4 +223,15 @@ func MakeGridFromLines(lines *[]string) Grid {
 		}
 	}
 	return g
+}
+
+func ShoelaceArea(path []GridPoint) int {
+	a, b, perimiter := 0, 0, 0
+	for i, p := range path[1:] {
+		a += path[i].X * p.Y
+		b += path[i].Y * p.X
+		perimiter += p.Distance(&path[i])
+	}
+	area := utils.AbsDiff(a, b) / 2
+	return 1 + area + perimiter/2
 }

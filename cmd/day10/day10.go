@@ -5,7 +5,7 @@ import (
 	"image"
 	"slices"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 10
@@ -173,8 +173,8 @@ func (pm *PipeMaze) contract() {
 	}
 	tiles := make(map[XY]Pipe)
 	for xy, r := range pm.tiles {
-		x, xr := internal.DivMod(xy.x, 2)
-		y, yr := internal.DivMod(xy.y, 2)
+		x, xr := utils.DivMod(xy.x, 2)
+		y, yr := utils.DivMod(xy.y, 2)
 		if xr == 0 && yr == 0 {
 			tiles[XY{x, y}] = r
 		}
@@ -258,7 +258,7 @@ func linesToMaze(data *[]string) PipeMaze {
 func Problem1(data *[]string) int {
 	maze := linesToMaze(data)
 	loop := maze.FindLoop()
-	q, r := internal.DivMod(len(loop), 2)
+	q, r := utils.DivMod(len(loop), 2)
 	return q + r
 }
 
@@ -271,11 +271,11 @@ func Problem2(data *[]string) int {
 		images = append(images, drawMaze(&maze))
 		delays := make([]int, len(images))
 		delays[0], delays[len(delays)-1] = 100, 100
-		internal.WriteAGif(&images, &delays, "problem2.gif")
+		utils.WriteAGif(&images, &delays, "problem2.gif")
 	}
 	return len(inclosed)
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

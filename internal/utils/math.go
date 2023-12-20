@@ -1,4 +1,4 @@
-package internal
+package utils
 
 import (
 	"fmt"
@@ -40,15 +40,4 @@ func AbsDiff[T int | uint | float64](a, b T) T {
 
 func Abs[T int | uint | float64](x T) T {
 	return AbsDiff[T](x, 0)
-}
-
-func ShoelaceArea(path []GridPoint) int {
-	a, b, perimiter := 0, 0, 0
-	for i, p := range path[1:] {
-		a += path[i].X * p.Y
-		b += path[i].Y * p.X
-		perimiter += p.Distance(&path[i])
-	}
-	area := AbsDiff(a, b) / 2
-	return 1 + area + perimiter/2
 }

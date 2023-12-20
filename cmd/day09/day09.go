@@ -1,7 +1,9 @@
 package main
 
 import (
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/functional"
+	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 9
@@ -19,11 +21,11 @@ func isZero(x int) bool {
 }
 
 func nextItemInHistory(s string) int {
-	history := internal.GetIntsFromString(s, " ")
+	history := utils.GetIntsFromString(s, " ")
 	steps := [][]int{history}
 	for {
 		next := getNextStep(&steps[len(steps)-1])
-		if internal.All(&next, isZero) {
+		if functional.All(&next, isZero) {
 			next = append(next, 0)
 			steps = append(steps, next)
 			break
@@ -31,18 +33,18 @@ func nextItemInHistory(s string) int {
 		steps = append(steps, next)
 	}
 	for i := len(steps) - 2; i >= 0; i-- {
-		x, y := internal.Last(&steps[i]), internal.Last(&steps[i+1])
+		x, y := functional.Last(&steps[i]), functional.Last(&steps[i+1])
 		steps[i] = append(steps[i], x+y)
 	}
-	return internal.Last(&steps[0])
+	return functional.Last(&steps[0])
 }
 
 func prevItemInHistory(s string) int {
-	history := internal.GetIntsFromString(s, " ")
+	history := utils.GetIntsFromString(s, " ")
 	steps := [][]int{history}
 	for {
 		next := getNextStep(&steps[len(steps)-1])
-		if internal.All(&next, isZero) {
+		if functional.All(&next, isZero) {
 			next = append(next, 0)
 			steps = append(steps, next)
 			break
@@ -57,13 +59,13 @@ func prevItemInHistory(s string) int {
 }
 
 func Problem1(data *[]string) int {
-	return internal.SumSolver(data, nextItemInHistory)
+	return solve.SumSolver(data, nextItemInHistory)
 }
 
 func Problem2(data *[]string) int {
-	return internal.SumSolver(data, prevItemInHistory)
+	return solve.SumSolver(data, prevItemInHistory)
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/functional"
+	"github.com/WadeGulbrandsen/aoc2023/internal/span"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -16,7 +18,7 @@ type workflow []rule
 
 type part map[string]int
 
-type RangeMap map[string]internal.Range
+type RangeMap map[string]span.Span
 
 func (sm *RangeMap) Product() int {
 	if len(*sm) == 0 {
@@ -24,7 +26,7 @@ func (sm *RangeMap) Product() int {
 	}
 	product := 1
 	for _, s := range *sm {
-		product *= internal.Range(s).Len()
+		product *= span.Span(s).Len()
 	}
 	return product
 }
@@ -86,7 +88,7 @@ func (s *sorter) AcceptedSpans(sm RangeMap, wf string) []RangeMap {
 	current := maps.Clone(sm)
 	for _, rule := range workflow {
 		next := maps.Clone(current)
-		var n, k internal.Range
+		var n, k span.Span
 		if rule.op == "<" {
 			n, k = current[rule.category].SplitAt(rule.val)
 		} else {
@@ -127,7 +129,7 @@ func parsePart(s string) part {
 }
 
 func parseInput(data *[]string) (sorter, []part) {
-	w, p, found := internal.Cut(data, "")
+	w, p, found := functional.Cut(data, "")
 	if !found {
 		return sorter{}, nil
 	}
@@ -155,8 +157,8 @@ func Problem1(data *[]string) int {
 	}
 	sum := 0
 	for _, a := range accepted {
-		vals := internal.GetMapValues(a)
-		sum += internal.Sum(&vals)
+		vals := utils.GetMapValues(a)
+		sum += functional.Sum(&vals)
 	}
 	return sum
 }
@@ -178,5 +180,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

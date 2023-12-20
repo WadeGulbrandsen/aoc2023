@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 4
@@ -78,7 +79,7 @@ func getScore(s string) int {
 }
 
 func Problem1(data *[]string) int {
-	return internal.SumSolver(data, getScore)
+	return solve.SumSolver(data, getScore)
 }
 
 func Problem2(data *[]string) int {
@@ -102,5 +103,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

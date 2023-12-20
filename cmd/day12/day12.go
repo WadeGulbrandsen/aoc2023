@@ -5,7 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/functional"
+	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 12
@@ -40,7 +42,7 @@ func countArrangements(data string, sizes []int) int {
 	if v, ok := cache.Get(&params); ok {
 		return v
 	}
-	total := internal.Sum(&sizes)
+	total := functional.Sum(&sizes)
 	minimum := strings.Count(data, "#")
 	maximum := len(data) - strings.Count(data, ".")
 	result := 0
@@ -76,7 +78,7 @@ func parse(s string, scale int) (string, []int) {
 	if !found {
 		return "", nil
 	}
-	ints := internal.GetIntsFromString(after, ",")
+	ints := utils.GetIntsFromString(after, ",")
 	data := before
 	sizes := ints
 	for i := 1; i < scale; i++ {
@@ -95,13 +97,13 @@ func expandAndCount(s string) int {
 }
 
 func Problem1(data *[]string) int {
-	return internal.SumSolver(data, getCount)
+	return solve.SumSolver(data, getCount)
 }
 
 func Problem2(data *[]string) int {
-	return internal.SumSolver(data, expandAndCount)
+	return solve.SumSolver(data, expandAndCount)
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

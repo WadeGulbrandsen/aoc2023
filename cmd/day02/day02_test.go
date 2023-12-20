@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -37,7 +37,7 @@ func TestSolutions(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("Day %v Problem %v with %v", Day, tc.problem, tc.filename), func(t *testing.T) {
-			data := internal.FileToLines(tc.filename)
+			data := utils.FileToLines(tc.filename)
 			if r := tc.fn(&data); tc.answer != r {
 				t.Fatalf("The correct answer is %v but received %v", tc.answer, r)
 			}

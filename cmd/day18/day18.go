@@ -4,21 +4,22 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/grid"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 18
 
 type digInstruction struct {
-	direction internal.GridDirection
+	direction grid.GridDirection
 	distance  int
 }
 
 type digPlan []digInstruction
 
-func (d digPlan) DigTrench() []internal.GridPoint {
-	current := internal.GridPoint{X: 0, Y: 0}
-	trench := []internal.GridPoint{current}
+func (d digPlan) DigTrench() []grid.GridPoint {
+	current := grid.GridPoint{X: 0, Y: 0}
+	trench := []grid.GridPoint{current}
 	for _, inst := range d {
 		current = current.Move(inst.direction, inst.distance)
 		trench = append(trench, current)
@@ -30,13 +31,13 @@ func standardParse(d, n string) (digInstruction, bool) {
 	inst := digInstruction{}
 	switch d {
 	case "U":
-		inst.direction = internal.N
+		inst.direction = grid.N
 	case "D":
-		inst.direction = internal.S
+		inst.direction = grid.S
 	case "L":
-		inst.direction = internal.W
+		inst.direction = grid.W
 	case "R":
-		inst.direction = internal.E
+		inst.direction = grid.E
 	default:
 		return inst, false
 	}
@@ -56,13 +57,13 @@ func colorParse(s string) (digInstruction, bool) {
 	h, d := s[:len(s)-1], s[len(s)-1:]
 	switch d {
 	case "3":
-		inst.direction = internal.N
+		inst.direction = grid.N
 	case "1":
-		inst.direction = internal.S
+		inst.direction = grid.S
 	case "2":
-		inst.direction = internal.W
+		inst.direction = grid.W
 	case "0":
-		inst.direction = internal.E
+		inst.direction = grid.E
 	default:
 		return inst, false
 	}
@@ -93,7 +94,7 @@ func Solve(data *[]string, color_parse bool) int {
 		}
 	}
 	trench := plan.DigTrench()
-	area := internal.ShoelaceArea(trench)
+	area := grid.ShoelaceArea(trench)
 	return area
 }
 
@@ -106,5 +107,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

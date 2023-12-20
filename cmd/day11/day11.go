@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/grid"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/mowshon/iterium"
 )
 
 const Day = 11
 
-func hasGalaxy(g *internal.Grid) (map[int]bool, map[int]bool) {
+func hasGalaxy(g *grid.Grid) (map[int]bool, map[int]bool) {
 	rows, cols := make(map[int]bool), make(map[int]bool)
 	for p := range g.Points {
 		rows[p.Y] = true
@@ -16,12 +17,12 @@ func hasGalaxy(g *internal.Grid) (map[int]bool, map[int]bool) {
 	return rows, cols
 }
 
-func expandUniverse(g *internal.Grid, scale int) {
+func expandUniverse(g *grid.Grid, scale int) {
 	if scale < 2 {
 		return
 	}
 	rows, cols := hasGalaxy(g)
-	new_points := make(map[internal.GridPoint]rune)
+	new_points := make(map[grid.GridPoint]rune)
 	for p, v := range g.Points {
 		new_x, new_y := p.X, p.Y
 		for x := 0; x < p.X; x++ {
@@ -36,15 +37,15 @@ func expandUniverse(g *internal.Grid, scale int) {
 		}
 		g.MaxPoint.X = max(g.MaxPoint.X, new_x+1)
 		g.MaxPoint.Y = max(g.MaxPoint.Y, new_y+1)
-		new_points[internal.GridPoint{X: new_x, Y: new_y}] = v
+		new_points[grid.GridPoint{X: new_x, Y: new_y}] = v
 	}
 	g.Points = new_points
 }
 
 func expandAndFindDistances(data *[]string, scale int) int {
-	g := internal.MakeGridFromLines(data)
+	g := grid.MakeGridFromLines(data)
 	expandUniverse(&g, scale)
-	combos := iterium.Combinations(internal.GetMapKeys(g.Points), 2)
+	combos := iterium.Combinations(utils.GetMapKeys(g.Points), 2)
 	sum := 0
 	for combo := range combos.Chan() {
 		sum += combo[0].Distance(&combo[1])
@@ -61,5 +62,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

@@ -1,7 +1,10 @@
 package main
 
 import (
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/functional"
+	"github.com/WadeGulbrandsen/aoc2023/internal/grid"
+	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 13
@@ -33,7 +36,7 @@ MAIN:
 }
 
 func findReflections(p []string) int {
-	g := internal.MakeGridFromLines(&p)
+	g := grid.MakeGridFromLines(&p)
 	rows := g.Rows()
 	if result := findReflection(rows); result != 0 {
 		return result * 100
@@ -61,7 +64,7 @@ MAIN:
 }
 
 func fixSmudges(p []string) int {
-	g := internal.MakeGridFromLines(&p)
+	g := grid.MakeGridFromLines(&p)
 	rows := g.Rows()
 	if result := findSmudge(rows); result != 0 {
 		return result * 100
@@ -71,15 +74,15 @@ func fixSmudges(p []string) int {
 }
 
 func Problem1(data *[]string) int {
-	patterns := internal.Split(data, "")
-	return internal.SumSolver(&patterns, findReflections)
+	patterns := functional.Split(data, "")
+	return solve.SumSolver(&patterns, findReflections)
 }
 
 func Problem2(data *[]string) int {
-	patterns := internal.Split(data, "")
-	return internal.SumSolver(&patterns, fixSmudges)
+	patterns := functional.Split(data, "")
+	return solve.SumSolver(&patterns, fixSmudges)
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

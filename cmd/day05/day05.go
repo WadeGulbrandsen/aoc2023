@@ -9,7 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/span"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 5
@@ -34,31 +35,31 @@ var backSteps = []string{
 	"seed-to-soil",
 }
 
-type Range = internal.Range
-type RangeList = internal.RangeList
+type Span = span.Span
+type SpanList = span.SpanList
 
-type RangeMap struct {
+type SpanMap struct {
 	dest, source, length int
 }
 
-func (r *RangeMap) GetRanges() (Range, Range) {
-	return Range{Start: r.source, End: r.source + r.length - 1},
-		Range{Start: r.dest, End: r.dest + r.length - 1}
+func (r *SpanMap) GetRanges() (Span, Span) {
+	return Span{Start: r.source, End: r.source + r.length - 1},
+		Span{Start: r.dest, End: r.dest + r.length - 1}
 }
 
-func (r *RangeMap) SourceRangeMapper() ProcessingMap {
+func (r *SpanMap) SourceRangeMapper() ProcessingMap {
 	s, _ := r.GetRanges()
 	return ProcessingMap{input: s, offset: r.dest - r.source}
 }
 
-func (r *RangeMap) Lookup(v int) (int, bool) {
+func (r *SpanMap) Lookup(v int) (int, bool) {
 	if v >= r.source && v < r.source+r.length {
 		return r.dest + v - r.source, true
 	}
 	return -1, false
 }
 
-func (r *RangeMap) RLookup(v int) (int, bool) {
+func (r *SpanMap) RLookup(v int) (int, bool) {
 	if v >= r.dest && v < r.dest+r.length {
 		return r.source + v - r.dest, true
 	}
@@ -68,7 +69,7 @@ func (r *RangeMap) RLookup(v int) (int, bool) {
 type Almanac struct {
 	lock  sync.RWMutex
 	seeds []int
-	maps  map[string][]RangeMap
+	maps  map[string][]SpanMap
 }
 
 func (a *Almanac) GetMapperForStep(step string) ProcessingMapList {
@@ -124,14 +125,14 @@ func getIntsFromString(s string, sep string) []int {
 	return ints
 }
 
-func getRangeMaps(s string) []RangeMap {
-	var r []RangeMap
-	ch := make(chan RangeMap)
+func getRangeMaps(s string) []SpanMap {
+	var r []SpanMap
+	ch := make(chan SpanMap)
 	lines := strings.Split(s, "\n")
 	for _, l := range lines {
 		go func(str string) {
 			ints := getIntsFromString(strings.TrimSpace(str), " ")
-			ch <- RangeMap{ints[0], ints[1], ints[2]}
+			ch <- SpanMap{ints[0], ints[1], ints[2]}
 		}(l)
 	}
 	for i := 0; i < len(lines); i++ {
@@ -169,7 +170,7 @@ func sliceToAlmanac(data *[]string, a *Almanac) {
 }
 
 func Problem1(data *[]string) int {
-	almanac := Almanac{maps: make(map[string][]RangeMap)}
+	almanac := Almanac{maps: make(map[string][]SpanMap)}
 	sliceToAlmanac(data, &almanac)
 	seeds := almanac.seeds
 	location := math.MaxInt
@@ -186,13 +187,13 @@ func Problem1(data *[]string) int {
 }
 
 type ProcessingMap struct {
-	input  Range
+	input  Span
 	offset int
 }
 
-func (p ProcessingMap) Process(r Range) (Range, Range, Range) {
+func (p ProcessingMap) Process(r Span) (Span, Span, Span) {
 	before, contained, after := p.input.SplitOtherRange(r)
-	output := Range{}
+	output := Span{}
 	if !contained.IsEmpty() {
 		output.Start = contained.Start + p.offset
 		output.End = contained.End + p.offset
@@ -201,7 +202,7 @@ func (p ProcessingMap) Process(r Range) (Range, Range, Range) {
 }
 
 func cmpPM(a, b ProcessingMap) int {
-	if n := internal.CompareRanges(a.input, b.input); n != 0 {
+	if n := span.CompareRanges(a.input, b.input); n != 0 {
 		return n
 	}
 	return cmp.Compare(a.offset, b.offset)
@@ -213,8 +214,8 @@ func (p ProcessingMapList) Sort() {
 	slices.SortFunc(p, cmpPM)
 }
 
-func (p ProcessingMapList) Process(r RangeList) RangeList {
-	var next RangeList
+func (p ProcessingMapList) Process(r SpanList) SpanList {
+	var next SpanList
 	for _, rl := range r {
 		remaining := rl
 		for _, pm := range p {
@@ -234,7 +235,7 @@ func (p ProcessingMapList) Process(r RangeList) RangeList {
 	return next
 }
 
-func getLocationRangesFromSeedRanges(a *Almanac, r RangeList, step int) RangeList {
+func getLocationRangesFromSeedRanges(a *Almanac, r SpanList, step int) SpanList {
 	r.Sort()
 	if step < 0 || step >= len(steps) {
 		return r
@@ -245,12 +246,12 @@ func getLocationRangesFromSeedRanges(a *Almanac, r RangeList, step int) RangeLis
 }
 
 func Problem2(data *[]string) int {
-	almanac := Almanac{maps: make(map[string][]RangeMap)}
+	almanac := Almanac{maps: make(map[string][]SpanMap)}
 	sliceToAlmanac(data, &almanac)
 	seeds := almanac.seeds
-	var ranges RangeList
+	var ranges SpanList
 	for i := 0; i < len(seeds); i += 2 {
-		ranges = append(ranges, Range{Start: seeds[i], End: seeds[i] + seeds[i+1] - 1})
+		ranges = append(ranges, Span{Start: seeds[i], End: seeds[i] + seeds[i+1] - 1})
 	}
 	fmt.Println(ranges)
 	locations := getLocationRangesFromSeedRanges(&almanac, ranges, 0)
@@ -261,5 +262,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

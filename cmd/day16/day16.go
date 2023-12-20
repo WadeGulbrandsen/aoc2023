@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/grid"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 16
@@ -23,7 +24,7 @@ const (
 )
 
 type lazer struct {
-	position  internal.GridPoint
+	position  grid.GridPoint
 	direction direction
 }
 
@@ -36,8 +37,8 @@ func (l *lazer) plane() plane {
 	}
 }
 
-func immaFirinMahLazer(g *internal.Grid, start lazer) int {
-	lazer_map := make(map[internal.GridPoint]rune)
+func immaFirinMahLazer(g *grid.Grid, start lazer) int {
+	lazer_map := make(map[grid.GridPoint]rune)
 	seen := make(map[lazer]bool)
 	lazers := []lazer{start}
 	for len(lazers) != 0 {
@@ -93,24 +94,24 @@ func immaFirinMahLazer(g *internal.Grid, start lazer) int {
 }
 
 func Problem1(data *[]string) int {
-	g := internal.MakeGridFromLines(data)
-	return immaFirinMahLazer(&g, lazer{internal.GridPoint{X: 0, Y: 0}, E})
+	g := grid.MakeGridFromLines(data)
+	return immaFirinMahLazer(&g, lazer{grid.GridPoint{X: 0, Y: 0}, E})
 }
 
 func Problem2(data *[]string) int {
-	g := internal.MakeGridFromLines(data)
+	g := grid.MakeGridFromLines(data)
 	m := 0
 	for x := 0; x < g.MaxPoint.X; x++ {
-		l1, l2 := lazer{internal.GridPoint{X: x, Y: 0}, S}, lazer{internal.GridPoint{X: x, Y: g.MaxPoint.Y - 1}, N}
+		l1, l2 := lazer{grid.GridPoint{X: x, Y: 0}, S}, lazer{grid.GridPoint{X: x, Y: g.MaxPoint.Y - 1}, N}
 		m = max(m, immaFirinMahLazer(&g, l1), immaFirinMahLazer(&g, l2))
 	}
 	for y := 0; y < g.MaxPoint.Y; y++ {
-		l1, l2 := lazer{internal.GridPoint{X: 0, Y: y}, E}, lazer{internal.GridPoint{X: g.MaxPoint.X - 1, Y: y}, W}
+		l1, l2 := lazer{grid.GridPoint{X: 0, Y: y}, E}, lazer{grid.GridPoint{X: g.MaxPoint.X - 1, Y: y}, W}
 		m = max(m, immaFirinMahLazer(&g, l1), immaFirinMahLazer(&g, l2))
 	}
 	return m
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

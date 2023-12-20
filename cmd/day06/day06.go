@@ -29,7 +29,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 6
@@ -66,7 +66,7 @@ func Problem1(data *[]string) int {
 	races := getRacesFromStrings(data)
 	var results []int
 	for _, r := range races {
-		if x1, x2, err := internal.Quadratic(1, -float64(r.time), float64(r.distance)); err == nil {
+		if x1, x2, err := utils.Quadratic(1, -float64(r.time), float64(r.distance)); err == nil {
 			h := math.Ceil(max(x1, x2)) - 1
 			l := math.Floor(min(x1, x2)) + 1
 			diff := h - l
@@ -100,7 +100,7 @@ func Problem2(data *[]string) int {
 	}
 	times, distances := (*data)[0], (*data)[1]
 	b, c := onlyDigits(times), onlyDigits(distances)
-	if x1, x2, err := internal.Quadratic(1, -float64(b), float64(c)); err == nil {
+	if x1, x2, err := utils.Quadratic(1, -float64(b), float64(c)); err == nil {
 		h := math.Ceil(max(x1, x2)) - 1
 		l := math.Floor(min(x1, x2)) + 1
 		diff := h - l
@@ -110,5 +110,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

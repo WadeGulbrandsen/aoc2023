@@ -5,8 +5,9 @@ import (
 	"math"
 	"slices"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/grid"
 	priorityqueue "github.com/WadeGulbrandsen/aoc2023/internal/priority_queue"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,8 +21,8 @@ func GetRuneValue(r rune) int {
 }
 
 type Crucible struct {
-	Point     internal.GridPoint
-	Direction internal.GridDirection
+	Point     grid.GridPoint
+	Direction grid.GridDirection
 	Traveled  int
 }
 
@@ -66,19 +67,19 @@ func (prev CrucibleList) Successors(g *CityGraph, min_steps, max_steps int) []Cr
 }
 
 type CityGraph struct {
-	grid   internal.Grid
-	blocks map[internal.GridPoint]int
+	grid   grid.Grid
+	blocks map[grid.GridPoint]int
 }
 
 func (g CityGraph) PrintSeen(searched map[Crucible]bool) string {
-	visited := make(map[internal.GridPoint]bool)
+	visited := make(map[grid.GridPoint]bool)
 	for k := range searched {
 		visited[k.Point] = true
 	}
 	s := ""
 	for y := 0; y < g.grid.MaxPoint.Y; y++ {
 		for x := 0; x < g.grid.MaxPoint.X; x++ {
-			if visited[internal.GridPoint{X: x, Y: y}] {
+			if visited[grid.GridPoint{X: x, Y: y}] {
 				s += "X"
 			} else {
 				s += "."
@@ -90,23 +91,23 @@ func (g CityGraph) PrintSeen(searched map[Crucible]bool) string {
 }
 
 func (g CityGraph) PrintPath(path []Crucible) string {
-	pathmap := make(map[internal.GridPoint]rune)
+	pathmap := make(map[grid.GridPoint]rune)
 	for _, c := range path {
 		switch c.Direction {
-		case internal.N:
+		case grid.N:
 			pathmap[c.Point] = '^'
-		case internal.E:
+		case grid.E:
 			pathmap[c.Point] = '>'
-		case internal.S:
+		case grid.S:
 			pathmap[c.Point] = 'v'
-		case internal.W:
+		case grid.W:
 			pathmap[c.Point] = '<'
 		}
 	}
 	s := ""
 	for y := 0; y < g.grid.MaxPoint.Y; y++ {
 		for x := 0; x < g.grid.MaxPoint.X; x++ {
-			p := internal.GridPoint{X: x, Y: y}
+			p := grid.GridPoint{X: x, Y: y}
 			if r := pathmap[p]; r != 0 {
 				s += string(r)
 			} else {
@@ -129,11 +130,11 @@ func (g CityGraph) Cost(p []Crucible) int {
 func findPath(g *CityGraph, min_steps, max_steps int) CrucibleList {
 	pq := &priorityqueue.PriorityQueue[CrucibleList]{}
 	seen := make(map[Crucible]bool)
-	s, e := internal.GridPoint{X: 0, Y: 0}, internal.GridPoint{X: g.grid.MaxPoint.X - 1, Y: g.grid.MaxPoint.Y - 1}
+	s, e := grid.GridPoint{X: 0, Y: 0}, grid.GridPoint{X: g.grid.MaxPoint.X - 1, Y: g.grid.MaxPoint.Y - 1}
 	heap.Init(pq)
-	east, south := s.Move(internal.E, 1), s.Move(internal.S, 1)
-	heap.Push(pq, &priorityqueue.Item[CrucibleList]{Value: CrucibleList{Crucible: Crucible{Point: east, Direction: internal.E}, Cost: g.blocks[east]}})
-	heap.Push(pq, &priorityqueue.Item[CrucibleList]{Value: CrucibleList{Crucible: Crucible{Point: south, Direction: internal.S}, Cost: g.blocks[south]}})
+	east, south := s.Move(grid.E, 1), s.Move(grid.S, 1)
+	heap.Push(pq, &priorityqueue.Item[CrucibleList]{Value: CrucibleList{Crucible: Crucible{Point: east, Direction: grid.E}, Cost: g.blocks[east]}})
+	heap.Push(pq, &priorityqueue.Item[CrucibleList]{Value: CrucibleList{Crucible: Crucible{Point: south, Direction: grid.S}, Cost: g.blocks[south]}})
 	for i := 0; pq.Len() > 0; i++ {
 		cl := heap.Pop(pq).(*priorityqueue.Item[CrucibleList]).Value
 		if seen[cl.Crucible] {
@@ -151,8 +152,8 @@ func findPath(g *CityGraph, min_steps, max_steps int) CrucibleList {
 }
 
 func solve(data *[]string, min_steps, max_steps int) int {
-	g := internal.MakeGridFromLines(data)
-	heat_map := make(map[internal.GridPoint]int)
+	g := grid.MakeGridFromLines(data)
+	heat_map := make(map[grid.GridPoint]int)
 	for p, r := range g.Points {
 		heat_map[p] = GetRuneValue(r)
 	}
@@ -171,5 +172,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

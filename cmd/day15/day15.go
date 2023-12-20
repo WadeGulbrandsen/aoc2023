@@ -4,7 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"goki.dev/ordmap"
 )
 
@@ -21,7 +22,7 @@ func hash(s string) int {
 
 func Problem1(data *[]string) int {
 	strings := strings.Split(strings.Join(*data, ""), ",")
-	return internal.SumSolver(&strings, hash)
+	return solve.SumSolver(&strings, hash)
 }
 
 func Problem2(data *[]string) int {
@@ -54,5 +55,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

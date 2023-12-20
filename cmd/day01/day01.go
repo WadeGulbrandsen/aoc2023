@@ -7,7 +7,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal"
+	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
+	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
 const Day = 1
@@ -79,13 +80,13 @@ func getNumberWithWords(s string) int {
 }
 
 func Problem1(data *[]string) int {
-	return internal.SumSolver(data, getNumber)
+	return solve.SumSolver(data, getNumber)
 }
 
 func Problem2(data *[]string) int {
-	return internal.SumSolver(data, getNumberWithWords)
+	return solve.SumSolver(data, getNumberWithWords)
 }
 
 func main() {
-	internal.CmdSolutionRunner(Day, Problem1, Problem2)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }
