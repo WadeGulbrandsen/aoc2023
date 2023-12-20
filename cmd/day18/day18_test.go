@@ -24,6 +24,7 @@ const file2input = file1input
 
 func TestSolutions(t *testing.T) {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	testCases := []struct {
 		problem  int
 		answer   int
