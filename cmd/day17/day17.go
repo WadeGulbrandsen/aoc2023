@@ -135,7 +135,7 @@ func findPath(g *CityGraph, min_steps, max_steps int) CrucibleList {
 	east, south := s.Move(grid.E, 1), s.Move(grid.S, 1)
 	heap.Push(pq, &priorityqueue.Item[CrucibleList]{Value: CrucibleList{Crucible: Crucible{Point: east, Direction: grid.E}, Cost: g.blocks[east]}})
 	heap.Push(pq, &priorityqueue.Item[CrucibleList]{Value: CrucibleList{Crucible: Crucible{Point: south, Direction: grid.S}, Cost: g.blocks[south]}})
-	for i := 0; pq.Len() > 0; i++ {
+	for pq.Len() > 0 {
 		cl := heap.Pop(pq).(*priorityqueue.Item[CrucibleList]).Value
 		if seen[cl.Crucible] {
 			continue

@@ -11,8 +11,8 @@ import (
 )
 
 // Answers
-const ans1sample = 0
-const ans1input = 0
+const ans1sample = 32000000
+const ans1input = 739960225
 const ans2sample = 0
 const ans2input = 0
 
@@ -32,6 +32,7 @@ func TestSolutions(t *testing.T) {
 		fn       func(*[]string) int
 	}{
 		{1, ans1sample, file1sample, Problem1},
+		{1, 11687500, "sample2.txt", Problem1},
 		{1, ans1input, file1input, Problem1},
 		{2, ans2sample, file2sample, Problem2},
 		{2, ans2input, file2input, Problem2},
