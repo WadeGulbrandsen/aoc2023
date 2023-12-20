@@ -8,6 +8,7 @@ import (
 
 	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
 	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
+	"github.com/rs/zerolog/log"
 )
 
 const Day = 4
@@ -70,11 +71,11 @@ func (c *Card) Score() (int, string) {
 func getScore(s string) int {
 	card, err := cardFromString(s)
 	if err != nil {
-		fmt.Println(err)
+		log.Err(err).Msg("card conversion")
 		return 0
 	}
 	score, message := card.Score()
-	fmt.Println(message)
+	log.Debug().Msg(message)
 	return score
 }
 

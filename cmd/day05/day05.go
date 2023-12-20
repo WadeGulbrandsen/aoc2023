@@ -2,7 +2,6 @@ package main
 
 import (
 	"cmp"
-	"fmt"
 	"math"
 	"slices"
 	"strconv"
@@ -253,7 +252,6 @@ func Problem2(data *[]string) int {
 	for i := 0; i < len(seeds); i += 2 {
 		ranges = append(ranges, Span{Start: seeds[i], End: seeds[i] + seeds[i+1] - 1})
 	}
-	fmt.Println(ranges)
 	locations := getLocationRangesFromSeedRanges(&almanac, ranges, 0)
 	if len(locations) > 0 {
 		return locations[0].Start

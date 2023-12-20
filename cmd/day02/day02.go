@@ -7,6 +7,7 @@ import (
 
 	"github.com/WadeGulbrandsen/aoc2023/internal/solve"
 	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
+	"github.com/rs/zerolog/log"
 )
 
 const Day = 2
@@ -76,31 +77,31 @@ func validateHand(h Hand) bool {
 func validateGame(s string) int {
 	g, err := stringToGame(s)
 	if err != nil {
-		fmt.Println(err)
+		log.Err(err).Msg("integer conversion")
 		return 0
 	}
 	if len(g.hands) == 0 {
-		fmt.Printf("Game %+v has no hands\n", g)
+		log.Debug().Msgf("Game %+v has no hands\n", g)
 		return 0
 	}
 	for i, hand := range g.hands {
 		if !validateHand(hand) {
-			fmt.Printf("Game %+v is invalid because hand %v is not valid\n", g, i)
+			log.Debug().Msgf("Game %+v is invalid because hand %v is not valid\n", g, i)
 			return 0
 		}
 	}
-	fmt.Printf("Game %+v is valid\n", g)
+	log.Debug().Msgf("Game %+v is valid\n", g)
 	return g.id
 }
 
 func minDiceNeededForGame(s string) int {
 	game, err := stringToGame(s)
 	if err != nil {
-		fmt.Println(err)
+		log.Err(err).Msg("game initialization")
 		return 0
 	}
 	if len(game.hands) == 0 {
-		fmt.Printf("Game %+v has no hands\n", game)
+		log.Debug().Msgf("Game %+v has no hands\n", game)
 		return 0
 	}
 	r, g, b := 0, 0, 0
@@ -110,7 +111,7 @@ func minDiceNeededForGame(s string) int {
 		b = max(b, hand.blue)
 	}
 	pow := r * g * b
-	fmt.Printf("Game %+v is valid needs %v red, %v green and %v blue cubes: %v\n", game, r, g, b, pow)
+	log.Debug().Msgf("Game %+v is valid needs %v red, %v green and %v blue cubes: %v\n", game, r, g, b, pow)
 	return pow
 }
 

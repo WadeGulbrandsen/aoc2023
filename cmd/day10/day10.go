@@ -266,7 +266,6 @@ func Problem2(data *[]string) int {
 	var images []*image.Paletted
 	maze := linesToMaze(data)
 	inclosed := maze.FindInclosed(&images)
-	fmt.Println(maze)
 	if render {
 		images = append(images, drawMaze(&maze))
 		delays := make([]int, len(images))
