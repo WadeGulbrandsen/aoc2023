@@ -13,18 +13,18 @@ const Day = 20
 
 type factory map[string]module
 
-func (f factory) PushButton() (map[pulse]int, bool) {
+func (f factory) PushButton(to_watch string) (map[pulse]int, map[string]bool) {
 	pulses := make(map[pulse]int)
 	pq := &priorityqueue.PriorityQueue[message]{}
 	heap.Init(pq)
 	heap.Push(pq, &priorityqueue.Item[message]{Value: message{input: "button", destination: "broadcaster", pulse: low}, Priority: 1})
 	i := 0
-	rx_low := false
+	seen_high := make(map[string]bool)
 	for pq.Len() > 0 {
 		current := heap.Pop(pq).(*priorityqueue.Item[message]).Value
-		if current.pulse == low && current.destination == "rx" {
+		if current.pulse == high && current.destination == to_watch {
+			seen_high[current.input] = true
 			log.Info().Msgf("%v -%v-> %v", current.input, current.pulse, current.destination)
-			rx_low = true
 		}
 		pulses[current.pulse]++
 		if mod, ok := f[current.destination]; ok {
@@ -34,7 +34,7 @@ func (f factory) PushButton() (map[pulse]int, bool) {
 			}
 		}
 	}
-	return pulses, rx_low
+	return pulses, seen_high
 }
 
 func parseModule(s string) (module, bool) {
@@ -54,7 +54,7 @@ func parseModule(s string) (module, bool) {
 	return nil, false
 }
 
-func parseModules(data *[]string) factory {
+func parseModules(data *[]string) (factory, string) {
 	factory := make(factory)
 	lookup_inputs := make(map[string][]string)
 	for _, line := range *data {
@@ -70,14 +70,18 @@ func parseModules(data *[]string) factory {
 			mod.add_inputs(lookup_inputs[name])
 		}
 	}
-	return factory
+
+	if rx_parent := lookup_inputs["rx"]; len(rx_parent) != 0 {
+		return factory, rx_parent[0]
+	}
+	return factory, ""
 }
 
 func Problem1(data *[]string) int {
-	factory := parseModules(data)
+	factory, _ := parseModules(data)
 	lows, highs := 0, 0
 	for i := 0; i < 1000; i++ {
-		pulses, _ := factory.PushButton()
+		pulses, _ := factory.PushButton("")
 		lows += pulses[low]
 		highs += pulses[high]
 	}
@@ -85,11 +89,26 @@ func Problem1(data *[]string) int {
 }
 
 func Problem2(data *[]string) int {
-	factory := parseModules(data)
-	for i := 1; i < 1000; i++ {
-		_, seen := factory.PushButton()
-		if seen {
-			return i
+	factory, rx_parent := parseModules(data)
+	if rx_parent == "" {
+		return 0
+	}
+	need := len(*factory[rx_parent].get_inputs())
+	results := make(map[string]int)
+	for i := 1; i < 10000; i++ {
+		_, seen_high := factory.PushButton(rx_parent)
+		for n := range seen_high {
+			if _, ok := results[n]; !ok {
+				results[n] = i
+				if len(results) == need {
+					vals := utils.GetMapValues(results)
+					lcm := vals[0]
+					for _, v := range vals[1:] {
+						lcm = utils.LCM(lcm, v)
+					}
+					return lcm
+				}
+			}
 		}
 	}
 	return 0

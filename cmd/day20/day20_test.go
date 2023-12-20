@@ -13,13 +13,11 @@ import (
 // Answers
 const ans1sample = 32000000
 const ans1input = 739960225
-const ans2sample = 0
-const ans2input = 0
+const ans2input = 231897990075517
 
 // filenames
 const file1sample = "sample.txt"
 const file1input = "input.txt"
-const file2sample = file1sample
 const file2input = file1input
 
 func TestSolutions(t *testing.T) {
@@ -34,7 +32,6 @@ func TestSolutions(t *testing.T) {
 		{1, ans1sample, file1sample, Problem1},
 		{1, 11687500, "sample2.txt", Problem1},
 		{1, ans1input, file1input, Problem1},
-		{2, ans2sample, file2sample, Problem2},
 		{2, ans2input, file2input, Problem2},
 	}
 	for _, tc := range testCases {

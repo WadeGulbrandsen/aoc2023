@@ -37,6 +37,7 @@ type module interface {
 	get_name() string
 	get_destinations() []string
 	get_type() modtype
+	get_inputs() *map[string]pulse
 }
 
 type flip_flop struct {
@@ -70,6 +71,10 @@ func (mod *flip_flop) get_type() modtype {
 }
 
 func (mod *flip_flop) add_inputs(names []string) {}
+
+func (mod *flip_flop) get_inputs() *map[string]pulse {
+	return nil
+}
 
 type conjunction struct {
 	name         string
@@ -111,6 +116,10 @@ func (mod *conjunction) add_inputs(names []string) {
 	}
 }
 
+func (mod *conjunction) get_inputs() *map[string]pulse {
+	return &mod.inputs
+}
+
 type broadcast struct {
 	name         string
 	destinations []string
@@ -137,3 +146,7 @@ func (mod *broadcast) get_type() modtype {
 }
 
 func (mod *broadcast) add_inputs(names []string) {}
+
+func (mod *broadcast) get_inputs() *map[string]pulse {
+	return nil
+}
