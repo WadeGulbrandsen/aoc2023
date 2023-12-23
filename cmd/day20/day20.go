@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"strings"
 
-	priorityqueue "github.com/WadeGulbrandsen/aoc2023/internal/priority_queue"
+	"github.com/WadeGulbrandsen/aoc2023/internal/heaps"
 	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 	"github.com/rs/zerolog/log"
 )
@@ -15,13 +15,13 @@ type factory map[string]module
 
 func (f factory) PushButton(to_watch string) (map[pulse]int, map[string]bool) {
 	pulses := make(map[pulse]int)
-	pq := &priorityqueue.PriorityQueue[message]{}
+	pq := &heaps.PriorityQueue[message]{}
 	heap.Init(pq)
-	heap.Push(pq, &priorityqueue.Item[message]{Value: message{input: "button", destination: "broadcaster", pulse: low}, Priority: 1})
+	heap.Push(pq, &heaps.Item[message]{Value: message{input: "button", destination: "broadcaster", pulse: low}, Priority: 1})
 	i := 0
 	seen_high := make(map[string]bool)
 	for pq.Len() > 0 {
-		current := heap.Pop(pq).(*priorityqueue.Item[message]).Value
+		current := heap.Pop(pq).(*heaps.Item[message]).Value
 		if current.pulse == high && current.destination == to_watch {
 			seen_high[current.input] = true
 			log.Info().Msgf("%v -%v-> %v", current.input, current.pulse, current.destination)
@@ -30,7 +30,7 @@ func (f factory) PushButton(to_watch string) (map[pulse]int, map[string]bool) {
 		if mod, ok := f[current.destination]; ok {
 			for _, next := range mod.handle_message(current) {
 				i--
-				heap.Push(pq, &priorityqueue.Item[message]{Value: next, Priority: i})
+				heap.Push(pq, &heaps.Item[message]{Value: next, Priority: i})
 			}
 		}
 	}
@@ -115,5 +115,5 @@ func Problem2(data *[]string) int {
 }
 
 func main() {
-	utils.RunSolutions(Day, Problem1, Problem2, "input.txt", "input.txt", -1)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }

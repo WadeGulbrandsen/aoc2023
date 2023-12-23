@@ -11,15 +11,15 @@ import (
 const Day = 18
 
 type digInstruction struct {
-	direction grid.GridDirection
+	direction grid.Direction
 	distance  int
 }
 
 type digPlan []digInstruction
 
-func (d digPlan) DigTrench() []grid.GridPoint {
-	current := grid.GridPoint{X: 0, Y: 0}
-	trench := []grid.GridPoint{current}
+func (d digPlan) DigTrench() []grid.Point {
+	current := grid.Point{X: 0, Y: 0}
+	trench := []grid.Point{current}
 	for _, inst := range d {
 		current = current.Move(inst.direction, inst.distance)
 		trench = append(trench, current)

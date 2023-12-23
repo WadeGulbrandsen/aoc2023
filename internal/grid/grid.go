@@ -6,16 +6,16 @@ import (
 	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
-type GridDirection rune
+type Direction rune
 
 const (
-	N GridDirection = 'N'
-	E GridDirection = 'E'
-	S GridDirection = 'S'
-	W GridDirection = 'W'
+	N Direction = 'N'
+	E Direction = 'E'
+	S Direction = 'S'
+	W Direction = 'W'
 )
 
-func (d GridDirection) TurnL() GridDirection {
+func (d Direction) TurnL() Direction {
 	switch d {
 	case N:
 		return W
@@ -29,7 +29,7 @@ func (d GridDirection) TurnL() GridDirection {
 	return d
 }
 
-func (d GridDirection) TurnR() GridDirection {
+func (d Direction) TurnR() Direction {
 	switch d {
 	case N:
 		return E
@@ -43,7 +43,7 @@ func (d GridDirection) TurnR() GridDirection {
 	return d
 }
 
-func (d GridDirection) Reverse() GridDirection {
+func (d Direction) Reverse() Direction {
 	switch d {
 	case N:
 		return S
@@ -57,93 +57,104 @@ func (d GridDirection) Reverse() GridDirection {
 	return d
 }
 
-type GridVector struct {
-	Point     GridPoint
-	Direction GridDirection
+type Vector struct {
+	Point     Point
+	Direction Direction
 }
 
-func (v *GridVector) TurnL() GridVector {
-	return GridVector{v.Point, v.Direction.TurnL()}
+func (v *Vector) TurnL() Vector {
+	return Vector{v.Point, v.Direction.TurnL()}
 }
 
-func (v *GridVector) TurnR() GridVector {
-	return GridVector{v.Point, v.Direction.TurnR()}
+func (v *Vector) TurnR() Vector {
+	return Vector{v.Point, v.Direction.TurnR()}
 }
 
-func (v *GridVector) Reverse() GridVector {
-	return GridVector{v.Point, v.Direction.Reverse()}
+func (v *Vector) Reverse() Vector {
+	return Vector{v.Point, v.Direction.Reverse()}
 }
 
-func (v *GridVector) Next() GridVector {
-	return GridVector{v.Point.Move(v.Direction, 1), v.Direction}
+func (v *Vector) Next() Vector {
+	return Vector{v.Point.Move(v.Direction, 1), v.Direction}
 }
 
-func (v *GridVector) MoveL() GridVector {
-	return GridVector{v.Point.Move(v.Direction.TurnL(), 1), v.Direction.TurnL()}
+func (v *Vector) MoveL() Vector {
+	return Vector{v.Point.Move(v.Direction.TurnL(), 1), v.Direction.TurnL()}
 }
 
-func (v *GridVector) MoveR() GridVector {
-	return GridVector{v.Point.Move(v.Direction.TurnR(), 1), v.Direction.TurnR()}
+func (v *Vector) MoveR() Vector {
+	return Vector{v.Point.Move(v.Direction.TurnR(), 1), v.Direction.TurnR()}
 }
 
-type GridPoint struct {
+type ChessColor int
+
+const (
+	White ChessColor = 0
+	Black ChessColor = 1
+)
+
+type Point struct {
 	X, Y int
 }
 
-func (p *GridPoint) Move(direction GridDirection, distance int) GridPoint {
+func (p Point) ChessColor() ChessColor {
+	return ChessColor((p.X + p.Y) % 2)
+}
+
+func (p *Point) Move(direction Direction, distance int) Point {
 	switch direction {
 	case N:
-		return GridPoint{p.X, p.Y - distance}
+		return Point{p.X, p.Y - distance}
 	case E:
-		return GridPoint{p.X + distance, p.Y}
+		return Point{p.X + distance, p.Y}
 	case S:
-		return GridPoint{p.X, p.Y + distance}
+		return Point{p.X, p.Y + distance}
 	case W:
-		return GridPoint{p.X - distance, p.Y}
+		return Point{p.X - distance, p.Y}
 	}
 	return *p
 }
 
-func (p *GridPoint) Distance(o *GridPoint) int {
+func (p *Point) Distance(o *Point) int {
 	dx := utils.AbsDiff[int](p.X, o.X)
 	dy := utils.AbsDiff[int](p.Y, o.Y)
 	return dx + dy
 }
 
-func (p *GridPoint) N() GridPoint {
-	return GridPoint{p.X, p.Y - 1}
+func (p *Point) N() Point {
+	return Point{p.X, p.Y - 1}
 }
 
-func (p *GridPoint) S() GridPoint {
-	return GridPoint{p.X, p.Y + 1}
+func (p *Point) S() Point {
+	return Point{p.X, p.Y + 1}
 }
 
-func (p *GridPoint) W() GridPoint {
-	return GridPoint{p.X - 1, p.Y}
+func (p *Point) W() Point {
+	return Point{p.X - 1, p.Y}
 }
 
-func (p *GridPoint) E() GridPoint {
-	return GridPoint{p.X + 1, p.Y}
+func (p *Point) E() Point {
+	return Point{p.X + 1, p.Y}
 }
 
 type Grid struct {
-	MinPoint GridPoint
-	MaxPoint GridPoint
-	Points   map[GridPoint]rune
+	MinPoint Point
+	MaxPoint Point
+	Points   map[Point]rune
 }
 
-func (g *Grid) InBounds(p GridPoint) bool {
+func (g *Grid) InBounds(p Point) bool {
 	return p.X >= g.MinPoint.X && p.X < g.MaxPoint.X && p.Y >= g.MinPoint.Y && p.Y < g.MaxPoint.Y
 }
 
-func (g *Grid) At(p GridPoint) rune {
+func (g *Grid) At(p Point) rune {
 	return g.Points[p]
 }
 
-func (g *Grid) Fill(p GridPoint, r rune) {
+func (g *Grid) Fill(p Point, r rune) {
 	to_replace := g.At(p)
-	to_check := []GridPoint{p}
-	checked := make(map[GridPoint]bool)
+	to_check := []Point{p}
+	checked := make(map[Point]bool)
 	for len(to_check) > 0 {
 		point := to_check[0]
 		to_check = to_check[1:]
@@ -153,7 +164,7 @@ func (g *Grid) Fill(p GridPoint, r rune) {
 		checked[point] = true
 		if g.At(point) == to_replace {
 			g.Points[point] = r
-			for _, next := range [4]GridPoint{point.N(), point.E(), point.S(), point.W()} {
+			for _, next := range [4]Point{point.N(), point.E(), point.S(), point.W()} {
 				if !checked[next] && g.At(next) == to_replace && g.InBounds(next) && !slices.Contains(to_check, next) {
 					to_check = append(to_check, next)
 				}
@@ -166,7 +177,7 @@ func (g Grid) String() string {
 	s := ""
 	for y := g.MinPoint.Y; y < g.MaxPoint.Y; y++ {
 		for x := g.MinPoint.X; x < g.MaxPoint.X; x++ {
-			r := g.At(GridPoint{x, y})
+			r := g.At(Point{x, y})
 			if r == 0 {
 				r = '.'
 			}
@@ -182,7 +193,7 @@ func (g *Grid) Rows() []string {
 	for y := g.MinPoint.Y; y < g.MaxPoint.Y; y++ {
 		line := ""
 		for x := g.MinPoint.X; x < g.MaxPoint.X; x++ {
-			if c := g.At(GridPoint{X: x, Y: y}); c != 0 {
+			if c := g.At(Point{X: x, Y: y}); c != 0 {
 				line += string(c)
 			} else {
 				line += "."
@@ -198,7 +209,7 @@ func (g *Grid) Columns() []string {
 	for x := g.MinPoint.X; x < g.MaxPoint.X; x++ {
 		line := ""
 		for y := g.MinPoint.Y; y < g.MaxPoint.Y; y++ {
-			if c := g.At(GridPoint{X: x, Y: y}); c != 0 {
+			if c := g.At(Point{X: x, Y: y}); c != 0 {
 				line += string(c)
 			} else {
 				line += "."
@@ -210,14 +221,14 @@ func (g *Grid) Columns() []string {
 }
 
 func MakeGridFromLines(lines *[]string) Grid {
-	g := Grid{Points: make(map[GridPoint]rune)}
+	g := Grid{Points: make(map[Point]rune)}
 	g.MaxPoint.Y = len(*lines)
 	if g.MaxPoint.Y > 0 {
 		g.MaxPoint.X = len((*lines)[0])
 		for y, l := range *lines {
 			for x, r := range l {
 				if r != '.' {
-					g.Points[GridPoint{x, y}] = r
+					g.Points[Point{x, y}] = r
 				}
 			}
 		}
@@ -225,7 +236,7 @@ func MakeGridFromLines(lines *[]string) Grid {
 	return g
 }
 
-func ShoelaceArea(path []GridPoint) int {
+func ShoelaceArea(path []Point) int {
 	a, b, perimiter := 0, 0, 0
 	for i, p := range path[1:] {
 		a += path[i].X * p.Y

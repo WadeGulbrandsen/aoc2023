@@ -47,6 +47,16 @@ func GetMapKeys[M ~map[K]V, K comparable, V any](m M) []K {
 	return keys
 }
 
+func KeysByVal[M ~map[K]V, K comparable, V comparable](m M, x V) []K {
+	var keys []K
+	for k, v := range m {
+		if v == x {
+			keys = append(keys, k)
+		}
+	}
+	return keys
+}
+
 func GetArgs() (string, int) {
 	var filename string
 	var loglevel int

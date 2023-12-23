@@ -24,7 +24,7 @@ const (
 )
 
 type lazer struct {
-	position  grid.GridPoint
+	position  grid.Point
 	direction direction
 }
 
@@ -38,7 +38,7 @@ func (l *lazer) plane() plane {
 }
 
 func immaFirinMahLazer(g *grid.Grid, start lazer) int {
-	lazer_map := make(map[grid.GridPoint]rune)
+	lazer_map := make(map[grid.Point]rune)
 	seen := make(map[lazer]bool)
 	lazers := []lazer{start}
 	for len(lazers) != 0 {
@@ -95,18 +95,18 @@ func immaFirinMahLazer(g *grid.Grid, start lazer) int {
 
 func Problem1(data *[]string) int {
 	g := grid.MakeGridFromLines(data)
-	return immaFirinMahLazer(&g, lazer{grid.GridPoint{X: 0, Y: 0}, E})
+	return immaFirinMahLazer(&g, lazer{grid.Point{X: 0, Y: 0}, E})
 }
 
 func Problem2(data *[]string) int {
 	g := grid.MakeGridFromLines(data)
 	m := 0
 	for x := 0; x < g.MaxPoint.X; x++ {
-		l1, l2 := lazer{grid.GridPoint{X: x, Y: 0}, S}, lazer{grid.GridPoint{X: x, Y: g.MaxPoint.Y - 1}, N}
+		l1, l2 := lazer{grid.Point{X: x, Y: 0}, S}, lazer{grid.Point{X: x, Y: g.MaxPoint.Y - 1}, N}
 		m = max(m, immaFirinMahLazer(&g, l1), immaFirinMahLazer(&g, l2))
 	}
 	for y := 0; y < g.MaxPoint.Y; y++ {
-		l1, l2 := lazer{grid.GridPoint{X: 0, Y: y}, E}, lazer{grid.GridPoint{X: g.MaxPoint.X - 1, Y: y}, W}
+		l1, l2 := lazer{grid.Point{X: 0, Y: y}, E}, lazer{grid.Point{X: g.MaxPoint.X - 1, Y: y}, W}
 		m = max(m, immaFirinMahLazer(&g, l1), immaFirinMahLazer(&g, l2))
 	}
 	return m

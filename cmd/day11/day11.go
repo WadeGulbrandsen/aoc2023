@@ -22,7 +22,7 @@ func expandUniverse(g *grid.Grid, scale int) {
 		return
 	}
 	rows, cols := hasGalaxy(g)
-	new_points := make(map[grid.GridPoint]rune)
+	new_points := make(map[grid.Point]rune)
 	for p, v := range g.Points {
 		new_x, new_y := p.X, p.Y
 		for x := 0; x < p.X; x++ {
@@ -37,7 +37,7 @@ func expandUniverse(g *grid.Grid, scale int) {
 		}
 		g.MaxPoint.X = max(g.MaxPoint.X, new_x+1)
 		g.MaxPoint.Y = max(g.MaxPoint.Y, new_y+1)
-		new_points[grid.GridPoint{X: new_x, Y: new_y}] = v
+		new_points[grid.Point{X: new_x, Y: new_y}] = v
 	}
 	g.Points = new_points
 }

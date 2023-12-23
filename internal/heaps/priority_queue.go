@@ -1,4 +1,4 @@
-package priorityqueue
+package heaps
 
 type Item[T any] struct {
 	Value    T

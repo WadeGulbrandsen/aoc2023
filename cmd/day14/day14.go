@@ -12,7 +12,7 @@ const Day = 14
 func tiltNorth(g *grid.Grid) {
 	for y := 1; y < g.MaxPoint.Y; y++ {
 		for x := 0; x < g.MaxPoint.X; x++ {
-			pos := grid.GridPoint{X: x, Y: y}
+			pos := grid.Point{X: x, Y: y}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
 				for i := 0; i < y; i++ {
@@ -34,7 +34,7 @@ func tiltNorth(g *grid.Grid) {
 func tiltEast(g *grid.Grid) {
 	for x := 1; x < g.MaxPoint.X; x++ {
 		for y := 0; y < g.MaxPoint.Y; y++ {
-			pos := grid.GridPoint{X: g.MaxPoint.X - x - 1, Y: y}
+			pos := grid.Point{X: g.MaxPoint.X - x - 1, Y: y}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
 				for i := 0; i < x; i++ {
@@ -56,7 +56,7 @@ func tiltEast(g *grid.Grid) {
 func tiltSouth(g *grid.Grid) {
 	for y := 1; y < g.MaxPoint.Y; y++ {
 		for x := 0; x < g.MaxPoint.X; x++ {
-			pos := grid.GridPoint{X: x, Y: g.MaxPoint.Y - y - 1}
+			pos := grid.Point{X: x, Y: g.MaxPoint.Y - y - 1}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
 				for i := 0; i < y; i++ {
@@ -78,7 +78,7 @@ func tiltSouth(g *grid.Grid) {
 func tiltWest(g *grid.Grid) {
 	for x := 1; x < g.MaxPoint.X; x++ {
 		for y := 0; y < g.MaxPoint.Y; y++ {
-			pos := grid.GridPoint{X: x, Y: y}
+			pos := grid.Point{X: x, Y: y}
 			if r := g.At(pos); r == 'O' {
 				new_pos := pos
 				for i := 0; i < x; i++ {
@@ -108,7 +108,7 @@ func calculateLoad(g *grid.Grid) int {
 	load := 0
 	for y := 0; y < g.MaxPoint.Y; y++ {
 		for x := 0; x < g.MaxPoint.X; x++ {
-			if g.At(grid.GridPoint{X: x, Y: y}) == 'O' {
+			if g.At(grid.Point{X: x, Y: y}) == 'O' {
 				load += g.MaxPoint.Y - y
 			}
 		}
@@ -122,7 +122,7 @@ func Problem1(data *[]string) int {
 	return calculateLoad(&g)
 }
 
-func getHistoryIndex(history *[]map[grid.GridPoint]rune, m map[grid.GridPoint]rune) int {
+func getHistoryIndex(history *[]map[grid.Point]rune, m map[grid.Point]rune) int {
 	for i, p := range *history {
 		if maps.Equal(p, m) {
 			return i
@@ -131,8 +131,8 @@ func getHistoryIndex(history *[]map[grid.GridPoint]rune, m map[grid.GridPoint]ru
 	return -1
 }
 
-func findSpinCycle(g *grid.Grid) (int, int, []map[grid.GridPoint]rune) {
-	var history []map[grid.GridPoint]rune
+func findSpinCycle(g *grid.Grid) (int, int, []map[grid.Point]rune) {
+	var history []map[grid.Point]rune
 	for {
 		spin(g)
 		if idx := getHistoryIndex(&history, g.Points); idx != -1 {
