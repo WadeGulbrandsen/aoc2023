@@ -2,7 +2,7 @@ package main
 
 import "github.com/WadeGulbrandsen/aoc2023/internal/utils"
 
-const Day = 0
+const Day = 24
 
 func Problem1(data *[]string) int {
 	return 0
