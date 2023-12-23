@@ -108,6 +108,17 @@ func CmdSolutionRunner[T any](day int, p1, p2 func(*[]string) T) {
 	RunSolutions(day, p1, p2, filename, filename, loglevel)
 }
 
+func GetFloatsFromString(s string, sep string) []float64 {
+	los := strings.Split(s, sep)
+	var floats []float64
+	for _, x := range los {
+		if v, err := strconv.ParseFloat(strings.TrimSpace(x), 64); err == nil {
+			floats = append(floats, v)
+		}
+	}
+	return floats
+}
+
 func GetIntsFromString(s string, sep string) []int {
 	los := strings.Split(s, sep)
 	return GetIntsFromStrings(&los)
