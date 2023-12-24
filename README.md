@@ -34,9 +34,7 @@ Added an interal library for ranges since they might be useful for future proble
 
 ## Day 10
 
-Made a visualization of filling the outside spaces and finding the inclosed spaces.
-
-![Day 10 Problem 2](cmd/day10/problem2.gif)
+Made a [visualization](cmd/day10/problem2.gif) of filling the outside spaces and finding the inclosed spaces.
 
 ## Test Coverage
 ![Go Coverage Chart](https://github.com/WadeGulbrandsen/aoc2023/wiki/coverage-chart.svg)
