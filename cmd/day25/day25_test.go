@@ -11,8 +11,8 @@ import (
 )
 
 // Answers
-const ans1sample = 0
-const ans1input = 0
+const ans1sample = 54
+const ans1input = 495607
 const ans2sample = 0
 const ans2input = 0
 
