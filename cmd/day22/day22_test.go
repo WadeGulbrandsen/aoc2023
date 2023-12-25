@@ -13,8 +13,8 @@ import (
 // Answers
 const ans1sample = 5
 const ans1input = 485
-const ans2sample = 0
-const ans2input = 0
+const ans2sample = 7
+const ans2input = 74594
 
 // filenames
 const file1sample = "sample.txt"

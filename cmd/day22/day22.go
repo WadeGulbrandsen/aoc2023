@@ -2,10 +2,12 @@ package main
 
 import (
 	"cmp"
+	"container/heap"
 	"slices"
 	"strings"
 
-	"github.com/WadeGulbrandsen/aoc2023/internal/functional"
+	"github.com/WadeGulbrandsen/aoc2023/internal/heaps"
+	"github.com/WadeGulbrandsen/aoc2023/internal/set"
 	"github.com/WadeGulbrandsen/aoc2023/internal/utils"
 )
 
@@ -16,6 +18,7 @@ type Point3D struct {
 }
 
 type Brick struct {
+	ID                 int
 	MinPoint, MaxPoint Point3D
 	Above, Below       []*Brick
 }
@@ -63,7 +66,7 @@ func parsePoint3D(s string) Point3D {
 	return Point3D{X: ints[0], Y: ints[1], Z: ints[2]}
 }
 
-func parseBrick(s string) Brick {
+func parseBrick(s string, id int) Brick {
 	before, after, found := strings.Cut(s, "~")
 	if !found {
 		return Brick{}
@@ -72,7 +75,7 @@ func parseBrick(s string) Brick {
 	if p1 == empty || p2 == empty {
 		return Brick{}
 	}
-	return Brick{MinPoint: p1, MaxPoint: p2}
+	return Brick{MinPoint: p1, MaxPoint: p2, ID: id}
 }
 
 func findBricksBelow(bricks *[]Brick, brick *Brick) []*Brick {
@@ -94,7 +97,7 @@ func findBricksBelow(bricks *[]Brick, brick *Brick) []*Brick {
 	return below
 }
 
-func (b *Brick) CanDisintegrate() bool {
+func (b *Brick) SafeToDisintegrate() bool {
 	for _, above := range b.Above {
 		if len(above.Below) <= 1 {
 			return false
@@ -103,8 +106,7 @@ func (b *Brick) CanDisintegrate() bool {
 	return true
 }
 
-func Problem1(data *[]string) int {
-	bricks := functional.Map(data, parseBrick)
+func dropIt(bricks []Brick) ([]Brick, int) {
 	slices.SortFunc(bricks, CmpBrickBottoms)
 	for i := range bricks {
 		if bricks[i].MinPoint.Z == 1 {
@@ -124,19 +126,75 @@ func Problem1(data *[]string) int {
 			}
 		}
 	}
+	return bricks, 0
+}
+
+func getBrickStack(data *[]string) []Brick {
+	var bricks []Brick
+	for i, s := range *data {
+		bricks = append(bricks, parseBrick(s, i+1))
+	}
+	bricks, _ = dropIt(bricks)
+	return bricks
+}
+
+func Problem1(data *[]string) int {
+	bricks := getBrickStack(data)
 	disintegration := 0
 	for _, b := range bricks {
-		if b.CanDisintegrate() {
+		if b.SafeToDisintegrate() {
 			disintegration++
 		}
 	}
 	return disintegration
 }
 
+func (b Brick) willFall(disintegrated *set.Set[int]) bool {
+	for _, below := range b.Below {
+		if !disintegrated.Contains(below.ID) {
+			return false
+		}
+	}
+	return true
+}
+
+func Disintegrate(start_id int, bricks *map[int]Brick) set.Set[int] {
+	disintegrated := set.NewSet[int]()
+	q := &heaps.PriorityQueue[int]{}
+	heap.Init(q)
+	heap.Push(q, &heaps.Item[int]{Value: start_id})
+	seen := make(map[int]bool)
+	for q.Len() > 0 {
+		id := heap.Pop(q).(*heaps.Item[int]).Value
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		if id == start_id || (*bricks)[id].willFall(&disintegrated) {
+			disintegrated.Add(id)
+			for _, above := range (*bricks)[id].Above {
+				heap.Push(q, &heaps.Item[int]{Value: above.ID, Priority: -above.MinPoint.Z})
+			}
+		}
+	}
+	return disintegrated
+}
+
 func Problem2(data *[]string) int {
-	return 0
+	bricks := make(map[int]Brick)
+	for _, b := range getBrickStack(data) {
+		bricks[b.ID] = b
+	}
+	sum := 0
+	for i, b := range bricks {
+		if !b.SafeToDisintegrate() {
+			results := Disintegrate(i, &bricks)
+			sum += len(results) - 1
+		}
+	}
+	return sum
 }
 
 func main() {
-	utils.RunSolutions(Day, Problem1, Problem2, "input.txt", "sample.txt", -1)
+	utils.CmdSolutionRunner(Day, Problem1, Problem2)
 }
